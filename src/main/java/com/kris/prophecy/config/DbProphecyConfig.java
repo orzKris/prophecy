@@ -20,7 +20,7 @@ import java.io.IOException;
 @MapperScan(basePackages = {"com.kris.prophecy.mapper"},
         sqlSessionFactoryRef = "prophecySqlSessionFactory")
 @ConfigurationProperties(prefix = "com.kris.datasource.prophecy")
-public class DbprophecyConfig extends DruidDataSource {
+public class DbProphecyConfig extends DruidDataSource {
 
     public DataSource getDataSource() {
         this.setDriverClassName("com.mysql.jdbc.Driver");
@@ -34,7 +34,7 @@ public class DbprophecyConfig extends DruidDataSource {
 
     @Primary
     @Bean
-    public DataSource getprophecyDataSource() {
+    public DataSource getProphecyDataSource() {
         return getDataSource();
     }
 
@@ -42,7 +42,7 @@ public class DbprophecyConfig extends DruidDataSource {
     @Bean("prophecySqlSessionFactory")
     public SqlSessionFactoryBean sessionFactoryBean() throws IOException {
         SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-        factoryBean.setDataSource(getprophecyDataSource());
+        factoryBean.setDataSource(getProphecyDataSource());
         Resource resource = new ClassPathResource("mybatis-config.xml");
         factoryBean.setConfigLocation(resource);
         return factoryBean;

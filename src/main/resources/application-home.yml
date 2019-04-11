@@ -6,11 +6,6 @@ com:
         username: debian-sys-maint
         password: 33NfmKUDjW6n5PHD
 
-    elastic_search:
-      url: http://192.168.3.4:9200
-      index: test
-      type: doc
-
 spring:
   redis:
     host: 127.0.0.1
