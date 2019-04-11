@@ -17,9 +17,7 @@ public class GenerateExcelScript {
 
     private final static int EXCEL_SIZE = 1000;
 
-    private final static String HOME_PATH = "xxx";
-
-    private final static String COMPANY_PATH = "xxx";
+    private final static String PATH = "xxx";
 
     public static void main(String[] args) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -39,7 +37,7 @@ public class GenerateExcelScript {
         }
         FileOutputStream output = null;
         try {
-            output = new FileOutputStream(COMPANY_PATH + "手机号1000.xls");
+            output = new FileOutputStream(PATH + "手机号1000.xls");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

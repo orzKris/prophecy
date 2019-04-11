@@ -32,9 +32,7 @@ public class DataDumpScript {
 
     private HttpEntity<String> requestEntity;
 
-    private final static String HOME_PATH = "xxx";
-
-    private final static String COMPANY_PATH = "xxx";
+    private final static String PATH = "xxx";
 
     @Before
     public void init() {
@@ -47,7 +45,7 @@ public class DataDumpScript {
     @Test
     public void dumpData() throws IOException {
         long start = System.currentTimeMillis();
-        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(COMPANY_PATH + "手机号1000.xls"));
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号1000.xls"));
         HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             HSSFRow row = sheet.getRow(i);
@@ -63,7 +61,7 @@ public class DataDumpScript {
             row.createCell(1).setCellValue(responseBody.toJSONString());
         }
         try {
-            FileOutputStream fileOutputStream = new FileOutputStream(COMPANY_PATH + "手机号归属地.xls");
+            FileOutputStream fileOutputStream = new FileOutputStream(PATH + "手机号归属地.xls");
             hssfWorkbook.write(fileOutputStream);
             fileOutputStream.flush();
         } catch (Exception e) {

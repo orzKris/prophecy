@@ -35,9 +35,7 @@ public class MultiThreadScript {
 
     private HttpEntity<String> requestEntity;
 
-    private final static String HOME_PATH = "xxx";
-
-    private final static String COMPANY_PATH = "xxx";
+    private final static String PATH = "xxx";
 
     @Before
     public void init() {
@@ -50,7 +48,7 @@ public class MultiThreadScript {
     @Test
     public void dumpData() throws IOException {
         long start = System.currentTimeMillis();
-        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(COMPANY_PATH + "手机号1000.xls"));
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号1000.xls"));
         HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
         List<Future> futureList = new ArrayList<Future>();
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -77,7 +75,7 @@ public class MultiThreadScript {
                 e.printStackTrace();
             }
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(COMPANY_PATH + "手机号归属地.xls");
+        FileOutputStream fileOutputStream = new FileOutputStream(PATH + "手机号归属地.xls");
         hssfWorkbook.write(fileOutputStream);
         fileOutputStream.flush();
         System.out.println("cost: " + (System.currentTimeMillis() - start) + "ms");
