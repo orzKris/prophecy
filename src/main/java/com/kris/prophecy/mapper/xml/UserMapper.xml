@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kris.prophecy.mapper.UserMapper">
+    <resultMap id="BaseResultMap" type="com.kris.prophecy.entity.User">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="age" property="age" jdbcType="INTEGER"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="VARCHAR"/>
+        <result column="school" property="school" jdbcType="VARCHAR"/>
+        <result column="subordinate_class" property="subordinateClass" jdbcType="VARCHAR"/>
+        <result column="graduation_time" property="graduationTime" jdbcType="INTEGER"/>
+        <result column="register_time" property="registerTime" jdbcType="TIMESTAMP"/>
+        <result column="uid" property="uid" jdbcType="VARCHAR"/>
+        <result column="balance" property="balance" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, name, age, password, sex, school, subordinate_class, graduation_time, register_time,
+        uid, balance
+    </sql>
+    <select id="selectByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where name = #{name,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByUid" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where uid = #{uid,jdbcType=VARCHAR}
+    </select>
+    <select id="selectLogin" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+        where name = #{name,jdbcType=VARCHAR}
+        and password = #{password,jdbcType=VARCHAR}
+    </select>
+    <select id="selectList" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user where 1 = 1
+        <if test="param1.id != null">
+            and id = #{param1.id,jdbcType=INTEGER}
+        </if>
+        <if test="param1.name != null">
+            and name like concat('%',#{param1.name,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="param1.uid != null">
+            and uid = #{param1.uid,jdbcType=VARCHAR}
+        </if>
+        <if test="param1.age != null">
+            and age = #{param1.age,jdbcType=INTEGER}
+        </if>
+        <if test="param1.password != null">
+            and password = #{param1.password,jdbcType=VARCHAR}
+        </if>
+        <if test="param1.sex != null">
+            and sex = #{param1.sex,jdbcType=VARCHAR}
+        </if>
+        <if test="param1.school != null">
+            and school = #{param1.school,jdbcType=INTEGER}
+        </if>
+        <if test="param1.subordinateClass != null">
+            and subordinate_class = #{param1.subordinateClass,jdbcType=VARCHAR}
+        </if>
+        <if test="param1.graduationTime != null">
+            and graduation_time = #{param1.graduationTime,jdbcType=INTEGER}
+        </if>
+        <if test="param1.registerTime != null">
+            and register_time = #{param1.registerTime,jdbcType=DATE}
+        </if>
+        <if test="param2 != null">
+            <!--<if test="param2.sort != null">-->
+            <!--order by-->
+            <!--<foreach collection="param2.sort" item="order" separator=",">-->
+            <!--${order.property} ${order.direction}-->
+            <!--</foreach>-->
+            <!--</if>-->
+            ORDER BY register_time DESC
+            <if test="param2.offset >= 0 and param2.pageSize > 0">
+                LIMIT ${param2.offset}, ${param2.pageSize}
+            </if>
+        </if>
+    </select>
+    <select id="selectCount" resultType="java.lang.Long">
+        select count(*)
+        from user where 1 = 1
+        <if test="id != null">
+            and id = #{id,jdbcType=INTEGER}
+        </if>
+        <if test="name != null">
+            and name like concat('%',#{name,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="uid != null">
+            and uid = #{uid,jdbcType=VARCHAR}
+        </if>
+        <if test="age != null">
+            and age = #{age,jdbcType=INTEGER}
+        </if>
+        <if test="password != null">
+            and password = #{password,jdbcType=VARCHAR}
+        </if>
+        <if test="sex != null">
+            and sex = #{sex,jdbcType=VARCHAR}
+        </if>
+        <if test="school != null">
+            and school = #{school,jdbcType=INTEGER}
+        </if>
+        <if test="subordinateClass != null">
+            and subordinate_class = #{subordinateClass,jdbcType=VARCHAR}
+        </if>
+        <if test="graduationTime != null">
+            and graduation_time = #{graduationTime,jdbcType=INTEGER}
+        </if>
+        <if test="registerTime != null">
+            and register_time = #{registerTime,jdbcType=DATE}
+        </if>
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from user
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.kris.prophecy.entity.User">
+        insert into user (id, name, age, password, sex, school, subordinate_class, graduation_time, register_time, uid)
+        values (#{id,jdbcType=INTEGER},
+                #{name,jdbcType=VARCHAR},
+                #{age,jdbcType=INTEGER},
+                #{password,jdbcType=VARCHAR},
+                #{sex,jdbcType=VARCHAR},
+                #{school,jdbcType=VARCHAR},
+                #{subordinateClass,jdbcType=VARCHAR},
+                #{graduationTime,jdbcType=INTEGER},
+                #{registerTime,jdbcType=TIMESTAMP},
+                #{uid,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" parameterType="com.kris.prophecy.entity.User">
+        insert into user
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="password != null">
+                password,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
+            <if test="school != null">
+                school,
+            </if>
+            <if test="subordinateClass != null">
+                subordinate_class,
+            </if>
+            <if test="graduationTime != null">
+                graduation_time,
+            </if>
+            <if test="registerTime != null">
+                register_time,
+            </if>
+            <if test="uid != null">
+                uid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="age != null">
+                #{age,jdbcType=INTEGER},
+            </if>
+            <if test="password != null">
+                #{password,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                #{sex,jdbcType=VARCHAR},
+            </if>
+            <if test="school != null">
+                #{school,jdbcType=VARCHAR},
+            </if>
+            <if test="subordinateClass != null">
+                #{subordinateClass,jdbcType=VARCHAR},
+            </if>
+            <if test="graduationTime != null">
+                #{graduationTime,jdbcType=INTEGER},
+            </if>
+            <if test="registerTime != null">
+                #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uid != null">
+                #{uid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByUidSelective" parameterType="com.kris.prophecy.entity.User">
+        update user
+        <set>
+            <if test="param1.name != null">
+                name = #{param1.name,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.age != null">
+                age = #{param1.age,jdbcType=INTEGER},
+            </if>
+            <if test="param1.password != null">
+                password = #{param1.password,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.sex != null">
+                sex = #{param1.sex,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.school != null">
+                school = #{param1.school,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.subordinateClass != null">
+                subordinate_class = #{param1.subordinateClass,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.graduationTime != null">
+                graduation_time = #{param1.graduationTime,jdbcType=INTEGER},
+            </if>
+            <if test="param1.registerTime != null">
+                register_time = #{param1.registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="param1.uid != null">
+                uid = #{param1.uid,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where uid = #{param1.uid,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByNameSelective" parameterType="com.kris.prophecy.entity.User">
+        update user
+        <set>
+            <if test="param1.age != null">
+                age = #{param1.age,jdbcType=INTEGER},
+            </if>
+            <if test="param1.password != null">
+                password = #{param1.password,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.sex != null">
+                sex = #{param1.sex,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.school != null">
+                school = #{param1.school,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.subordinateClass != null">
+                subordinate_class = #{param1.subordinateClass,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.graduationTime != null">
+                graduation_time = #{param1.graduationTime,jdbcType=INTEGER},
+            </if>
+            <if test="param1.registerTime != null">
+                register_time = #{param1.registerTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="param1.uid != null">
+                uid = #{param1.uid,jdbcType=VARCHAR},
+            </if>
+            <if test="param1.balance != null">
+                balance = balance + #{param1.balance,jdbcType=INTEGER},
+            </if>
+        </set>
+        where name = #{param1.name,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.kris.prophecy.entity.User">
+        update user
+        set name              = #{name,jdbcType=VARCHAR},
+            age               = #{age,jdbcType=INTEGER},
+            password          = #{password,jdbcType=VARCHAR},
+            sex               = #{sex,jdbcType=VARCHAR},
+            school            = #{school,jdbcType=VARCHAR},
+            subordinate_class = #{subordinateClass,jdbcType=VARCHAR},
+            graduation_time   = #{graduationTime,jdbcType=INTEGER},
+            register_time     = #{registerTime,jdbcType=TIMESTAMP},
+            uid               = #{uid,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <insert id="insertUserList" parameterType="java.util.List">
+        insert into user (name, age, password, sex, school, subordinate_class, graduation_time, uid) values
+        <foreach collection="userList" item="user" separator=",">
+            (#{user.name,jdbcType=VARCHAR},#{user.age,jdbcType=INTEGER},#{user.password,jdbcType=VARCHAR},
+            #{user.sex,jdbcType=VARCHAR},#{user.school,jdbcType=VARCHAR},#{user.subordinateClass,jdbcType=VARCHAR}
+            ,#{user.graduationTime,jdbcType=INTEGER},#{user.uid,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+</mapper>

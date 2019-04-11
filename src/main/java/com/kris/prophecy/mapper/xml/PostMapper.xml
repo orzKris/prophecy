@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kris.prophecy.mapper.PostMapper">
+    <resultMap id="BaseResultMap" type="com.kris.prophecy.entity.Post">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="likes" property="likes" jdbcType="INTEGER"/>
+        <result column="reply_name" property="replyName" jdbcType="VARCHAR"/>
+        <result column="reply_content" property="replyContent" jdbcType="VARCHAR"/>
+        <result column="reply_time" property="replyTime" jdbcType="TIMESTAMP"/>
+        <result column="respondent_name" property="respondentName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapI" type="com.kris.prophecy.entity.PostOverview">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="uid" property="uid" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="likes" property="likes" jdbcType="INTEGER"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+    </resultMap>
+    <resultMap id="ResultMapII" type="com.kris.prophecy.entity.PostDetail">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="reply_name" property="replyName" jdbcType="VARCHAR"/>
+        <result column="reply_content" property="replyContent" jdbcType="VARCHAR"/>
+        <result column="reply_time" property="replyTime" jdbcType="TIMESTAMP"/>
+        <result column="respondent_name" property="respondentName" jdbcType="VARCHAR"/>
+        <result column="rid" property="rid" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, uid, title, content, create_time, flag, likes
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from post
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+    <select id="selectByRid" resultType="java.lang.Integer">
+        select pid
+        from post_reply
+        where id = #{rid,jdbcType=INTEGER}
+    </select>
+    <select id="selectOverview" resultMap="ResultMapI">
+        select
+        p.id, p.uid, p.title, p.content, p.create_time, p.likes,u.name as name
+        from post p left join user u on p.uid=u.uid
+        where p.flag=1
+        <if test="param2 != null">
+            and #{param2,jdbcType=VARCHAR} &lt; p.create_time
+        </if>
+        <if test="param3 != null">
+            and p.create_time &lt; DATE_ADD(#{param3,jdbcType=VARCHAR},INTERVAL 1 DAY)
+        </if>
+        <if test="param1.title != null">
+            and p.title like concat('%',#{param1.title,jdbcType=VARCHAR},'%')
+        </if>
+        <if test="param1.content != null">
+            and p.content like concat('%',#{param1.content,jdbcType=VARCHAR},'%')
+        </if>
+        order by create_time desc
+    </select>
+    <select id="selectDetail" resultMap="ResultMapII">
+        select pr.id, u.name as reply_name, pr.content as reply_content, pr.reply_time, pr.rid
+        from post_reply pr
+                 left join user u on pr.uid = u.uid
+        where pid = #{id,jdbcType=INTEGER}
+        order by reply_time desc
+    </select>
+    <select id="selectDetailName" resultMap="ResultMapII">
+        select pr.id,u.name as reply_name,pr.content as reply_content,pr.reply_time,pr.rid
+        from post_reply pr left join user u on pr.uid=u.uid
+        where 1=1
+        and  pr.id in
+        (
+        <foreach collection="rids" item="rid" separator=",">
+            #{rid,jdbcType=INTEGER}
+        </foreach>
+        )
+        order by reply_time desc
+    </select>
+    <select id="selectCount" resultMap="ResultMapI">
+        select pid as id
+        from post_reply where pid in (
+        <foreach collection="ids" item="id" separator=",">
+            #{id,jdbcType=INTEGER}
+        </foreach>
+        )
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from post
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.kris.prophecy.entity.Post">
+        insert into post (id, uid, title, content, create_time, flag, likes)
+        values (#{id,jdbcType=INTEGER},
+                #{uid,jdbcType=VARCHAR},
+                #{title,jdbcType=VARCHAR},
+                #{content,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP},
+                #{flag,jdbcType=INTEGER},
+                #{likes,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.kris.prophecy.entity.Post">
+        insert into post
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="uid != null">
+                uid,
+            </if>
+            <if test="title != null">
+                title,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="likes != null">
+                likes,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="uid != null">
+                #{uid,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="likes != null">
+                #{likes,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <insert id="insertReply" parameterType="com.kris.prophecy.entity.Post">
+        insert into post_reply
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                pid,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="rid != null">
+                rid,
+            </if>
+            <if test="replyUid != null">
+                uid,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="rid != null">
+                #{rid,jdbcType=VARCHAR},
+            </if>
+            <if test="replyUid != null">
+                #{replyUid,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="plusByPrimaryKeySelective" parameterType="com.kris.prophecy.entity.Post">
+        update post
+        <set>
+            <if test="uid != null">
+                uid = #{uid,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+                likes = likes + 1,
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="minusByPrimaryKeySelective" parameterType="com.kris.prophecy.entity.Post">
+        update post
+        <set>
+            <if test="uid != null">
+                uid = #{uid,jdbcType=VARCHAR},
+            </if>
+            <if test="title != null">
+                title = #{title,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            likes = likes - 1,
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.kris.prophecy.entity.Post">
+        update post
+        set uid         = #{uid,jdbcType=VARCHAR},
+            title       = #{title,jdbcType=VARCHAR},
+            content     = #{content,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            flag        = #{flag,jdbcType=INTEGER},
+            likes       = #{likes,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

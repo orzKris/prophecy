@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kris.prophecy.mapper.VirtualCurrencyMapper">
+    <resultMap id="BaseResultMap" type="com.kris.prophecy.entity.VirtualCurrency">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="account_name" jdbcType="VARCHAR" property="accountName"/>
+        <result column="transaction" jdbcType="INTEGER" property="transaction"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, account_name, transaction, update_time
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from virtual_currency
+        where id = #{id,jdbcType=INTEGER} and TIMESTAMPDIFF(day,update_time,now()) &lt; 180;
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from virtual_currency
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.kris.prophecy.entity.VirtualCurrency">
+        insert into virtual_currency (id, account_name, transaction, update_time)
+        values (#{id,jdbcType=INTEGER},
+                #{accountName,jdbcType=VARCHAR},
+                #{transaction,jdbcType=INTEGER},
+                #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" parameterType="com.kris.prophecy.entity.VirtualCurrency">
+        insert into virtual_currency
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="accountName != null">
+                account_name,
+            </if>
+            <if test="transaction != null">
+                transaction,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="accountName != null">
+                #{accountName,jdbcType=VARCHAR},
+            </if>
+            <if test="transaction != null">
+                #{transaction,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.kris.prophecy.entity.VirtualCurrency">
+        update virtual_currency
+        <set>
+            <if test="accountName != null">
+                account_name = #{accountName,jdbcType=VARCHAR},
+            </if>
+            <if test="transaction != null">
+                transaction = #{transaction,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.kris.prophecy.entity.VirtualCurrency">
+        update virtual_currency
+        set account_name = #{accountName,jdbcType=VARCHAR},
+            transaction  = #{transaction,jdbcType=INTEGER},
+            update_time  = #{updateTime,jdbcType=TIMESTAMP}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+</mapper>

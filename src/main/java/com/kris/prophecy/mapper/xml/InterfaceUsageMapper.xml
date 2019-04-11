@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.kris.prophecy.mapper.InterfaceUsageMapper" >
+  <resultMap id="BaseResultMap" type="com.kris.prophecy.entity.InterfaceUsage" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="uid" property="uid" jdbcType="VARCHAR" />
+    <result column="uri" property="uri" jdbcType="VARCHAR" />
+    <result column="response_time" property="responseTime" jdbcType="INTEGER" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="args" property="args" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="fail_message" property="failMessage" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, uid, uri, response_time, update_time, args, status, fail_message
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from interface_usage_statistics
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from interface_usage_statistics
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kris.prophecy.entity.InterfaceUsage" >
+    insert into interface_usage_statistics (id, uid, uri, 
+      response_time, update_time, args, 
+      status, fail_message)
+    values (#{id,jdbcType=INTEGER}, #{uid,jdbcType=VARCHAR}, #{uri,jdbcType=VARCHAR}, 
+      #{responseTime,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{args,jdbcType=VARCHAR}, 
+      #{status,jdbcType=VARCHAR}, #{failMessage,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kris.prophecy.entity.InterfaceUsage" >
+    insert into interface_usage_statistics
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="uid != null" >
+        uid,
+      </if>
+      <if test="uri != null" >
+        uri,
+      </if>
+      <if test="responseTime != null" >
+        response_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+      <if test="args != null" >
+        args,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="failMessage != null" >
+        fail_message,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="uid != null" >
+        #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="uri != null" >
+        #{uri,jdbcType=VARCHAR},
+      </if>
+      <if test="responseTime != null" >
+        #{responseTime,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="args != null" >
+        #{args,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="failMessage != null" >
+        #{failMessage,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kris.prophecy.entity.InterfaceUsage" >
+    update interface_usage_statistics
+    <set >
+      <if test="uid != null" >
+        uid = #{uid,jdbcType=VARCHAR},
+      </if>
+      <if test="uri != null" >
+        uri = #{uri,jdbcType=VARCHAR},
+      </if>
+      <if test="responseTime != null" >
+        response_time = #{responseTime,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="args != null" >
+        args = #{args,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="failMessage != null" >
+        fail_message = #{failMessage,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kris.prophecy.entity.InterfaceUsage" >
+    update interface_usage_statistics
+    set uid = #{uid,jdbcType=VARCHAR},
+      uri = #{uri,jdbcType=VARCHAR},
+      response_time = #{responseTime,jdbcType=INTEGER},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      args = #{args,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      fail_message = #{failMessage,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
