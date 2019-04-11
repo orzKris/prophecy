@@ -40,7 +40,7 @@ public class DataDumpScript {
     public void init() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("uid", "876da611-a14a-3aa7-a28d-df43b332a923");
+        headers.add("uid", "0be1e377-50c4-4dc6-9100-9c3c7a734ca8");
         requestEntity = new HttpEntity<>(headers);
     }
 
