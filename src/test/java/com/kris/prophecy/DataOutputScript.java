@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class DataOutputScript {
 
-    private final static String PATH = "xxx";
+    private final static String PATH = "C:\\Users\\huyan\\Desktop\\";
 
     public static Request getRequest(JSONObject param) {
         return new Request.Builder()
@@ -31,7 +31,7 @@ public class DataOutputScript {
 
     public static void main(String[] args) throws IOException {
         long start = System.currentTimeMillis();
-        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号100.xls"));
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号1000.xls"));
         HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
             HSSFRow row = sheet.getRow(i);
