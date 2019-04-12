@@ -50,7 +50,7 @@ public class ConcurrentController {
             new BasicThreadFactory.Builder().namingPattern("Schedule-thread-pool-%d").daemon(true).build());
 
     @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Result main(HttpServletRequest request, @PathVariable("id") String id) {
+    public JSONObject main(HttpServletRequest request, @PathVariable("id") String id) {
         long start = System.currentTimeMillis();
         DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
@@ -59,7 +59,7 @@ public class ConcurrentController {
 
         Result paramResult = checkParam(param, uid, requestTime);
         if (!paramResult.getStatus().equals(ResponseConstant.SUCCESS)) {
-            return paramResult;
+            return paramResult.toJson();
         }
         JSONObject paramJson = paramResult.getJsonResult();
         if (paramJson.containsKey(RequestConstant.FILE_UPLOAD)) {
@@ -68,7 +68,7 @@ public class ConcurrentController {
         }
         String serviceName = callMap.getMap().get(id);
         if (serviceName == null) {
-            return new Result(RequestConstant.NO_CONFIGURED_SERVICE);
+            return new Result(RequestConstant.NO_CONFIGURED_SERVICE).toJson();
         }
         paramJson.put(RequestConstant.UID, uid);
         LogUtil.logInfo(uid, "调用的服务有：" + serviceName);
@@ -79,7 +79,7 @@ public class ConcurrentController {
         Result checkResult = concurrentCallable.checkParam(paramJson);
         if (ResponseConstant.PARAM_ERROR.equals(checkResult.getStatus())) {
             checkResult.setName(serviceName);
-            return checkResult;
+            return checkResult.toJson();
         }
         Future<Result> future = executorCompletionService.submit(concurrentCallable);
         Result result = new Result();
@@ -87,16 +87,16 @@ public class ConcurrentController {
             result = future.get(20000, TimeUnit.MILLISECONDS);
             result.setName(serviceName);
             LogUtil.logInfo(uid, result.getJsonResult().toJSONString());
-            return result;
+            return result.toJson();
         } catch (TimeoutException e) {
-            return new Result(serviceName, ResponseConstant.DISPATCH_TIMEOUT);
+            return new Result(serviceName, ResponseConstant.DISPATCH_TIMEOUT).toJson();
         } catch (Exception e) {
             result = new Result(serviceName, ResponseConstant.FAIL);
             JSONObject jsonResult = new JSONObject();
             jsonResult.put(ResponseConstant.RESPONSE, ResponseConstant.DISPATCH_ERROR);
             result.setJsonResult(jsonResult);
             LogUtil.logError(uid, requestTime, param, RequestConstant.SERVICE_PROCESS_ERROR, e);
-            return result;
+            return result.toJson();
         } finally {
             interfaceUsageService.insertInterfaceUsage(start, request.getRequestURI(), param, uid, result.getStatus());
         }

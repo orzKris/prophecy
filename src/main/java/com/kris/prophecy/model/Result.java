@@ -61,4 +61,13 @@ public class Result {
         return result;
     }
 
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", name);
+        jsonObject.put("status", status);
+        jsonObject.put("jsonResult", jsonResult);
+        jsonObject.put("dataFrom", dataFrom);
+        return jsonObject;
+    }
+
 }
