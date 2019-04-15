@@ -3,10 +3,12 @@ package com.kris.prophecy.enums;
 import java.util.Arrays;
 
 /**
+ * 聚合数据数据源错误码
+ *
  * @author Kris
  * @date 2019/3/1
  */
-public enum ErrorCodeEnum {
+public enum JuheErrorCodeEnum {
 
     E228000("网络超时"),
     E220801("服务商网络异常,请重试"),
@@ -32,11 +34,11 @@ public enum ErrorCodeEnum {
 
     String desc;
 
-    private ErrorCodeEnum(String desc) {
+    private JuheErrorCodeEnum(String desc) {
         this.desc = desc;
     }
 
     public static String getDesc(String code) {
-        return Arrays.stream(ErrorCodeEnum.values()).filter(dp022ErrorCodeEnum -> dp022ErrorCodeEnum.name().endsWith(code)).findFirst().orElse(ErrorCodeEnum.UNKNOWN).desc;
+        return Arrays.stream(JuheErrorCodeEnum.values()).filter(juheErrorCodeEnum -> juheErrorCodeEnum.name().endsWith(code)).findFirst().orElse(JuheErrorCodeEnum.UNKNOWN).desc;
     }
 }

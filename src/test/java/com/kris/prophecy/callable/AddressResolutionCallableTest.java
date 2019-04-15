@@ -1,7 +1,7 @@
 package com.kris.prophecy.callable;
 
 import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.enums.ResponseConstant;
+import com.kris.prophecy.enums.LocalErrorCode;
 import com.kris.prophecy.model.Result;
 import com.kris.prophecy.framework.DispatchService;
 import org.junit.Assert;
@@ -65,7 +65,7 @@ public class AddressResolutionCallableTest {
         JSONObject jsonObject = new JSONObject();
         JSONObject json = new JSONObject();
         jsonObject.put("result", json);
-        Result result = new Result(ResponseConstant.SUCCESS);
+        Result result = new Result(LocalErrorCode.SUCCESS);
         result.setJsonResult(jsonObject);
         when(dispatchService.dispatch(any(), any())).thenReturn(result);
         Result resultActual = addressResolutionCallable.call();
@@ -78,7 +78,7 @@ public class AddressResolutionCallableTest {
         JSONObject json = new JSONObject();
         json.put("address", "New York");
         jsonObject.put("result", json);
-        Result result = new Result(ResponseConstant.SUCCESS);
+        Result result = new Result(LocalErrorCode.SUCCESS);
         result.setJsonResult(jsonObject);
         when(dispatchService.dispatch(any(), any())).thenReturn(result);
         Result resultActual = addressResolutionCallable.call();
@@ -91,7 +91,7 @@ public class AddressResolutionCallableTest {
         JSONObject json = new JSONObject();
         json.put("address", "New York");
         jsonObject.put("result", json);
-        Result result = new Result(ResponseConstant.SUCCESS);
+        Result result = new Result(LocalErrorCode.SUCCESS);
         result.setJsonResult(jsonObject);
         doThrow(new RuntimeException()).when(dispatchService).dispatch(any(), any());
         Result resultActual = addressResolutionCallable.call();

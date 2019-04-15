@@ -25,4 +25,6 @@ public final class AddressResolutionConstant {
     public static final String ERROR_CODE = "error_code";
 
     public static final String SUCCESS = "0";
+
+    public static final String RESPONSE = "response";
 }

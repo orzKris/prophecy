@@ -439,14 +439,6 @@ public class ProphecyApplicationTests {
     }
 
     @Test
-    public void listToJson() {
-        List<Result> results = new ArrayList<>();
-        results.add(new Result("test", "nice"));
-        results.add(new Result("play", "world"));
-        System.out.println(JSON.toJSONString(results));
-    }
-
-    @Test
     public void JsonToMap(){
         JSONObject obj = new JSONObject();
         {

@@ -1,9 +1,9 @@
 package com.kris.prophecy.reflect.impl;
 
+import com.kris.prophecy.enums.LocalErrorCode;
 import com.kris.prophecy.reflect.annotation.InvokeListener;
 import com.kris.prophecy.reflect.annotation.ServiceDataMapping;
 import com.kris.prophecy.enums.RequestConstant;
-import com.kris.prophecy.enums.ResponseConstant;
 import com.kris.prophecy.entity.InterfaceUsage;
 import com.kris.prophecy.mapper.InterfaceUsageMapper;
 import com.kris.prophecy.mapper.UserMapper;
@@ -84,7 +84,7 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
             return this.exceptionHandler(tag, uid, rid, requestTime, interfaceUsage, e);
         } catch (Exception e) {
             LogUtil.logError(uid, requestTime, conditionMessage, e.getMessage(), e);
-            interfaceUsage.setStatus(ResponseConstant.FAIL);
+            interfaceUsage.setStatus(LocalErrorCode.FAIL.getCode());
             interfaceUsage.setFailMessage(e.getMessage().replace("'", ""));
             throw e;
         } finally {
@@ -94,7 +94,7 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
     }
 
     private String exceptionHandler(String tag, String uid, String rid, String start, InterfaceUsage interfaceUsage, InvocationTargetException e) throws Throwable {
-        interfaceUsage.setStatus(ResponseConstant.FAIL);
+        interfaceUsage.setStatus(LocalErrorCode.FAIL.getCode());
         Throwable throwable = e.getTargetException();
         String conditionMessage = String.format("tag=%s,rid=%s", tag, rid);
 

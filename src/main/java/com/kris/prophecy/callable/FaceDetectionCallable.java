@@ -73,7 +73,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
             return getData(base64data);
         } catch (Exception e) {
             LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, base64data, "请求旷视人脸检测接口失败", e);
-            return new Result(ResponseConstant.FAIL);
+            return new Result(LocalErrorCode.FAIL);
         }
     }
 

@@ -78,7 +78,7 @@ public class MovieInformationCallable implements ConcurrentCallable {
             return getData(title, searchFlag, pageSize, requestTime);
         } catch (Exception e) {
             LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, conditionMessage, "请求聚合影讯集合接口失败", e);
-            return new Result(ResponseConstant.FAIL);
+            return new Result(LocalErrorCode.FAIL);
         }
     }
 
@@ -102,11 +102,8 @@ public class MovieInformationCallable implements ConcurrentCallable {
         Result result = dispatchService.dispatch(dispatchRequest, true);
         String code = result.getJsonResult().getString(MovieInformationConstant.ERROR_CODE);
         if (DataFromEnum.DATA_FROM_DATASOURCE == result.getDataFrom() && !MovieInformationConstant.SUCCESS.equals(code)) {
-            JSONObject json = new JSONObject();
-            json.put(ResponseConstant.RESPONSE, ResponseConstant.DATASOURCE_ERROR);
-            result.setJsonResult(json);
-            LogUtil.logWarn(paramJson.getString(RequestConstant.UID), requestTime, code, ErrorCodeEnum.getDesc(code));
-            return result;
+            LogUtil.logWarn(paramJson.getString(RequestConstant.UID), requestTime, code, JuheErrorCodeEnum.getDesc(code));
+            return new Result(LocalErrorCode.DATASOURCE_ERROR);
         }
         return dealQueryResult(result, dispatchRequest);
     }

@@ -13,7 +13,6 @@ public enum DataFromEnum implements IEnum<Integer> {
     DATA_FROM_REDIS(1, "数据来源于Redis缓存"),
     DATA_FROM_MONGO(2, "数据来源于Mongo缓存"),
     DATA_FROM_DATASOURCE(3, "数据来源于数据源"),
-    //有些接口，一次请求可能会查询多次数据源或缓存
     DATA_FROM_MULTI_SOURCE(4, "数据来源于数据源和缓存,适用于一次调用查询多次源或缓存的接口"),
     DATA_FROM_MYSQL(6, "从mysql获取数据");
 

@@ -63,7 +63,7 @@ public class LanguageDetectCallable implements ConcurrentCallable {
         String uid = paramJson.getString(RequestConstant.UID);
         long start = System.currentTimeMillis();
 
-        Result result = new Result(ResponseConstant.SUCCESS);
+        Result result = new Result(LocalErrorCode.SUCCESS);
         try {
             JSONObject jsonResult = HttpClientUtil.get(url, map);
             String lang = dictionaryConversion(jsonResult);
@@ -74,7 +74,7 @@ public class LanguageDetectCallable implements ConcurrentCallable {
             return result;
         } catch (Exception e) {
             LogUtil.logError(uid, requestTime, text, "请求百度语言识别接口失败", e);
-            return new Result(ResponseConstant.FAIL);
+            return new Result(LocalErrorCode.FAIL);
         } finally {
             paramJson.remove(RequestConstant.UID);
             String id = KeyUtil.structureKey(paramJson, ServiceIdEnum.D001.getId());
