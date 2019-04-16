@@ -2,7 +2,7 @@ package com.kris.prophecy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.config.ApplicationContextRegister;
-import com.kris.prophecy.enums.LocalErrorCode;
+import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.enums.RequestConstant;
 import com.kris.prophecy.model.Result;
 import com.kris.prophecy.model.CallMap;
@@ -59,7 +59,7 @@ public class ConcurrentController {
         String uid = request.getHeader(RequestConstant.UID);
 
         Response paramResult = checkParam(param, uid, requestTime);
-        if (!paramResult.getResponseCode().equals(LocalErrorCode.SUCCESS.getCode())) {
+        if (!paramResult.getResponseCode().equals(DataErrorCode.SUCCESS.getCode())) {
             return paramResult;
         }
         JSONObject paramJson = (JSONObject) paramResult.getResult();
@@ -69,7 +69,7 @@ public class ConcurrentController {
         }
         String serviceName = callMap.getMap().get(id);
         if (serviceName == null) {
-            return Response.error(LocalErrorCode.NO_CONFIGURED_SERVICE);
+            return Response.error(DataErrorCode.NO_CONFIGURED_SERVICE);
         }
         paramJson.put(RequestConstant.UID, uid);
         LogUtil.logInfo(uid, "调用的服务有：" + serviceName);
@@ -78,7 +78,7 @@ public class ConcurrentController {
         ConcurrentCallable concurrentCallable = (ConcurrentCallable) applicationContextRegister.getApplicationContext().getBean(serviceName);
         concurrentCallable.init(paramJson);
         Result checkResult = concurrentCallable.checkParam(paramJson);
-        if (LocalErrorCode.PARAM_ERROR.equals(checkResult.getStatus())) {
+        if (DataErrorCode.PARAM_ERROR.equals(checkResult.getStatus())) {
             checkResult.setName(serviceName);
             return new Response<>(checkResult.getStatus().getCode(),checkResult.getStatus().getErrorMsg(),checkResult.toJson());
         }
@@ -91,9 +91,9 @@ public class ConcurrentController {
             return new Response<>(result.getStatus().getCode(), result.getStatus().getErrorMsg(), result.toJson());
 
         } catch (TimeoutException e) {
-            return Response.error(LocalErrorCode.DISPATCH_TIMEOUT);
+            return Response.error(DataErrorCode.DISPATCH_TIMEOUT);
         } catch (Exception e) {
-            return Response.error(LocalErrorCode.DISPATCH_ERROR);
+            return Response.error(DataErrorCode.DISPATCH_ERROR);
         } finally {
             interfaceUsageService.insertInterfaceUsage(start, request.getRequestURI(), param, uid, result.getStatus().getCode());
         }
@@ -101,7 +101,7 @@ public class ConcurrentController {
 
     private Response checkParam(String param, String uid, String requestTime) {
         if (StringUtils.isBlank(param)) {
-            return Response.error(LocalErrorCode.PARAM_ERROR);
+            return Response.error(DataErrorCode.PARAM_ERROR);
         }
         param = param.replaceAll(" ", "");
 
@@ -109,7 +109,7 @@ public class ConcurrentController {
             return Response.ok(JSONObject.parseObject(param));
         } catch (Exception e) {
             LogUtil.logError(uid, requestTime, param, RequestConstant.PARAM_MUST_BE_JSON, e);
-            return Response.error(LocalErrorCode.PARAM_ERROR);
+            return Response.error(DataErrorCode.PARAM_ERROR);
         }
     }
 

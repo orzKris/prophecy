@@ -2,6 +2,7 @@ package com.kris.prophecy.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Message;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.utils.PageData;
 
 
@@ -11,11 +12,11 @@ import com.kris.prophecy.utils.PageData;
  */
 public interface MessageService {
 
-    JSONObject sendMessage(Message message);
+    Response sendMessage(Message message);
 
-    JSONObject deleteMessage(Message message);
+    Response deleteMessage(Message message);
 
-    PageData<Message> listMessage(Integer page, Integer pageSize, Integer readFlag, String uid);
+    Response listMessage(Integer page, Integer pageSize, Integer readFlag, String uid);
 
-    JSONObject readMessage(Integer id,Integer flag,String uid);
+    Response readMessage(Integer id,Integer flag,String uid);
 }

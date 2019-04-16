@@ -63,7 +63,7 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
         String conditionMessage = String.format("interfaceId=%s,page=%s,pageSize=%s", interfaceId, page, pageSize);
         long start = System.currentTimeMillis();
 
-        Result result = new Result(LocalErrorCode.SUCCESS);
+        Result result = new Result(DataErrorCode.SUCCESS);
         JSONObject jsonResult = new JSONObject();
         JSONArray jsonArray;
         try {
@@ -80,7 +80,7 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
             }
         } catch (Exception e) {
             LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, conditionMessage, "大数据输出失败", e);
-            return new Result(LocalErrorCode.FAIL);
+            return new Result(DataErrorCode.FAIL);
         }
         jsonResult.put(DataDevelopmentConstant.RESULT_ARRAY, jsonArray);
         jsonResult.put(DataDevelopmentConstant.PAGE_SIZE, pageSize);

@@ -1,10 +1,11 @@
 package com.kris.prophecy.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
 import com.kris.prophecy.entity.VirtualCurrency;
+import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.UserMapper;
 import com.kris.prophecy.mapper.VirtualCurrencyMapper;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,19 +26,17 @@ public class CurrencyServiceImpl implements CurrencyService {
      * 账户充值
      */
     @Override
-    public JSONObject recharge(VirtualCurrency virtualCurrency) {
+    public Response recharge(VirtualCurrency virtualCurrency) {
         int ret1 = virtualCurrencyMapper.insertSelective(virtualCurrency);
         User user = new User();
         user.setBalance(virtualCurrency.getTransaction());
         user.setName(virtualCurrency.getAccountName());
         int ret2 = userMapper.updateByNameSelective(user);
-        JSONObject jsonObject = new JSONObject();
-        if (ret1>0&&ret2>0){
-            jsonObject.put("response_msg","充值成功");
+
+        if (ret1 > 0 && ret2 > 0) {
+            return Response.message("充值成功");
+        } else {
+            return Response.error(UserErrorCode.FAIL);
         }
-        else {
-            jsonObject.put("response_msg","充值失败");
-        }
-        return jsonObject;
     }
 }

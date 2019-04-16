@@ -1,7 +1,8 @@
 package com.kris.prophecy.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.VirtualCurrency;
+import com.kris.prophecy.enums.UserErrorCode;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.CurrencyService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +24,12 @@ public class CurrencyController {
      * 账户充值
      */
     @PostMapping(value = "/recharge", produces = "application/json;charset=UTF-8")
-    public JSONObject recharge(@RequestBody VirtualCurrency virtualCurrency, @RequestHeader("uid") String uid) {
-        JSONObject jsonObject = new JSONObject();
+    public Response recharge(@RequestBody VirtualCurrency virtualCurrency, @RequestHeader("uid") String uid) {
         if (StringUtils.isBlank(virtualCurrency.getAccountName()) || virtualCurrency.getTransaction() == null) {
-            jsonObject.put("response_msg", "缺少参数");
-            return jsonObject;
+            return Response.error(UserErrorCode.PARAM_ERROR);
         }
         if ((virtualCurrency.getTransaction() > MAX_TRANSACTION)) {
-            jsonObject.put("response_msg", "最大充值金额为1000000");
-            return jsonObject;
+            return Response.error(UserErrorCode.CURRENCY_ERROR);
         }
         return currencyService.recharge(virtualCurrency);
     }

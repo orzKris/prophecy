@@ -3,7 +3,7 @@ package com.kris.prophecy.model;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.enums.DataFromEnum;
-import com.kris.prophecy.enums.LocalErrorCode;
+import com.kris.prophecy.enums.DataErrorCode;
 import lombok.Data;
 
 /**
@@ -15,7 +15,7 @@ public class Result {
 
     private String name;
 
-    private LocalErrorCode status;
+    private DataErrorCode status;
 
     private JSONObject jsonResult;
 
@@ -26,21 +26,21 @@ public class Result {
     public Result() {
     }
 
-    public Result(LocalErrorCode status) {
+    public Result(DataErrorCode status) {
         this.status = status;
     }
 
-    public Result(LocalErrorCode status, JSONObject jsonResult) {
+    public Result(DataErrorCode status, JSONObject jsonResult) {
         this.status = status;
         this.jsonResult = jsonResult;
     }
 
-    public Result(String name, LocalErrorCode status) {
+    public Result(String name, DataErrorCode status) {
         this.name = name;
         this.status = status;
     }
 
-    public Result(String name, LocalErrorCode status, JSONObject jsonResult, DataFromEnum dataFrom) {
+    public Result(String name, DataErrorCode status, JSONObject jsonResult, DataFromEnum dataFrom) {
         this.name = name;
         this.status = status;
         this.jsonResult = jsonResult;
@@ -48,7 +48,7 @@ public class Result {
     }
 
     public static Result success() {
-        Result result = new Result(LocalErrorCode.SUCCESS);
+        Result result = new Result(DataErrorCode.SUCCESS);
         return result;
     }
 
@@ -56,7 +56,7 @@ public class Result {
         Result result = new Result();
         JSONObject jsonResult = new JSONObject();
         jsonResult.put("response", s);
-        result.setStatus(LocalErrorCode.PARAM_ERROR);
+        result.setStatus(DataErrorCode.PARAM_ERROR);
         result.setJsonResult(jsonResult);
         return result;
     }

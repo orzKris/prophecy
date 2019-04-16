@@ -1,8 +1,9 @@
 package com.kris.prophecy.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.enums.LocalErrorCode;
+import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.model.Result;
+import com.kris.prophecy.model.common.util.Response;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,24 +26,16 @@ public class KafkaTestController {
     private KafkaTemplate kafkaTemplate;
 
     @RequestMapping(value = "/send", method = RequestMethod.GET)
-    public Result sendKafka(HttpServletRequest request) {
+    public Response sendKafka(HttpServletRequest request) {
         try {
             String message = request.getParameter("message");
             log.info("kafka的消息={}", message);
             kafkaTemplate.send("test", "key", message);
             log.info("发送kafka成功");
-            Result result = new Result("kafka测试", LocalErrorCode.SUCCESS);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("response", message);
-            result.setJsonResult(jsonObject);
-            return result;
+            return Response.message("kafka测试成功");
         } catch (Exception e) {
             log.error("发送kafka失败", e);
-            Result result = new Result("kafka测试", LocalErrorCode.SUCCESS);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("response", "kafka测试失败");
-            result.setJsonResult(jsonObject);
-            return result;
+            return Response.message("kafka测试失败");
         }
     }
 

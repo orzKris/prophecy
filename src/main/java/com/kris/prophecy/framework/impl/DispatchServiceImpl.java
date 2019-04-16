@@ -3,7 +3,7 @@ package com.kris.prophecy.framework.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.enums.DataFromEnum;
-import com.kris.prophecy.enums.LocalErrorCode;
+import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.framework.MongoService;
 import com.kris.prophecy.model.DataCenter;
 import com.kris.prophecy.model.Result;
@@ -47,7 +47,7 @@ public class DispatchServiceImpl implements DispatchService {
     @Override
     public Result dispatch(DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
         Result result = this.dispatchCache(dispatchRequest);
-        if (LocalErrorCode.FAIL.getCode().equals(result.getStatus()) || result.getJsonResult() == null) {
+        if (DataErrorCode.FAIL.getCode().equals(result.getStatus()) || result.getJsonResult() == null) {
             result = this.dispatchDatasource(dispatchRequest, isParsed);
         }
         return result;
@@ -56,7 +56,7 @@ public class DispatchServiceImpl implements DispatchService {
     @Override
     public Result dispatchDatasource(DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
         if (!dispatchRequest.isEnable()) {
-            return new Result(LocalErrorCode.INTERFACE_FORBIDDEN);
+            return new Result(DataErrorCode.INTERFACE_FORBIDDEN);
         }
         String responseBody = "";
         long start = System.currentTimeMillis();
@@ -66,14 +66,14 @@ public class DispatchServiceImpl implements DispatchService {
             Call call = dispatchRequest.getOkHttpClient().newCall(request);
             Response response = call.execute();
             if (response.code() != HTTP_STATUS) {
-                return new Result(callMap.getMap().get(dispatchRequest.getDsId()), LocalErrorCode.DATASOURCE_ERROR);
+                return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.DATASOURCE_ERROR);
             }
             responseBody = response.body().string();
             if (isParsed) {
                 JSONObject jsonResult = JSONObject.parseObject(responseBody);
-                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), LocalErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_DATASOURCE);
+                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_DATASOURCE);
             } else {
-                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), LocalErrorCode.SUCCESS, new JSONObject(), DataFromEnum.DATA_FROM_DATASOURCE);
+                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, new JSONObject(), DataFromEnum.DATA_FROM_DATASOURCE);
                 result.setContentNotParsed(responseBody);
             }
             return result;
@@ -90,10 +90,10 @@ public class DispatchServiceImpl implements DispatchService {
         JSONObject jsonResult = new JSONObject();
         try {
             jsonResult = JSON.parseObject(redisService.get(dispatchRequest.getKey()));
-            Result result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), LocalErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_REDIS);
+            Result result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_REDIS);
             return result;
         } catch (Exception e) {
-            return new Result(callMap.getMap().get(dispatchRequest.getDsId()), LocalErrorCode.FAIL, jsonResult, DataFromEnum.DATA_FROM_REDIS);
+            return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.FAIL, jsonResult, DataFromEnum.DATA_FROM_REDIS);
         } finally {
             LogUtil.logInfoRedis("调度服务", responseBody, start, dispatchRequest.getRequestParam().toJSONString());
         }

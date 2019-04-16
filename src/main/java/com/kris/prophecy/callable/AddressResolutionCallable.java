@@ -73,7 +73,7 @@ public class AddressResolutionCallable implements ConcurrentCallable {
             return getData(longitude, latitude, requestTime);
         } catch (Exception e) {
             LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, conditionMessage, "请求聚合经纬地址解析接口失败", e);
-            return new Result(LocalErrorCode.FAIL);
+            return new Result(DataErrorCode.FAIL);
         }
     }
 
@@ -97,7 +97,7 @@ public class AddressResolutionCallable implements ConcurrentCallable {
         String code = result.getJsonResult().getString(AddressResolutionConstant.ERROR_CODE);
         if (!code.equals(AddressResolutionConstant.SUCCESS)) {
             LogUtil.logWarn(paramJson.getString(RequestConstant.UID), requestTime, code, JuheErrorCodeEnum.getDesc(code));
-            return new Result(LocalErrorCode.DATASOURCE_ERROR);
+            return new Result(DataErrorCode.DATASOURCE_ERROR);
         }
         JSONObject jsonResult = result.getJsonResult().getJSONObject(AddressResolutionConstant.RESULT);
         String address = jsonResult.getString(AddressResolutionConstant.SOURCE_ADDRESS);

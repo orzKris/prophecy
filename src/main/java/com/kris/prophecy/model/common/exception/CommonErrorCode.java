@@ -17,7 +17,6 @@ public enum  CommonErrorCode implements ErrorCode {
     METHOD_NOT_ALLOWED("10000405","请求方法不支持：{0}")
     ;
 
-
     private String code;
 
     private String errorMsg;
