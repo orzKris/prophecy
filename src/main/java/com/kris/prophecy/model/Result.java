@@ -3,7 +3,7 @@ package com.kris.prophecy.model;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.enums.DataFromEnum;
-import com.kris.prophecy.enums.ResponseConstant;
+import com.kris.prophecy.enums.DataErrorCode;
 import lombok.Data;
 
 /**
@@ -15,7 +15,7 @@ public class Result {
 
     private String name;
 
-    private String status;
+    private DataErrorCode status;
 
     private JSONObject jsonResult;
 
@@ -26,21 +26,21 @@ public class Result {
     public Result() {
     }
 
-    public Result(String status) {
+    public Result(DataErrorCode status) {
         this.status = status;
     }
 
-    public Result(String status, JSONObject jsonResult) {
+    public Result(DataErrorCode status, JSONObject jsonResult) {
         this.status = status;
         this.jsonResult = jsonResult;
     }
 
-    public Result(String name, String status) {
+    public Result(String name, DataErrorCode status) {
         this.name = name;
         this.status = status;
     }
 
-    public Result(String name, String status, JSONObject jsonResult, DataFromEnum dataFrom) {
+    public Result(String name, DataErrorCode status, JSONObject jsonResult, DataFromEnum dataFrom) {
         this.name = name;
         this.status = status;
         this.jsonResult = jsonResult;
@@ -48,17 +48,25 @@ public class Result {
     }
 
     public static Result success() {
-        Result result = new Result(ResponseConstant.SUCCESS);
+        Result result = new Result(DataErrorCode.SUCCESS);
         return result;
     }
 
     public static Result fail(String s) {
         Result result = new Result();
         JSONObject jsonResult = new JSONObject();
-        jsonResult.put(ResponseConstant.RESPONSE, s);
-        result.setStatus(ResponseConstant.PARAM_ERROR);
+        jsonResult.put("response", s);
+        result.setStatus(DataErrorCode.PARAM_ERROR);
         result.setJsonResult(jsonResult);
         return result;
+    }
+
+    public JSONObject toJson() {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", name);
+        jsonObject.put("jsonResult", jsonResult);
+        jsonObject.put("dataFrom", dataFrom);
+        return jsonObject;
     }
 
 }

@@ -83,7 +83,7 @@ public interface PostMapper {
     /**
      * 插入点赞状态
      */
-    @Insert("asyncInsert into like_statistics (like_flag,uid,pid) values (1,#{uid},#{pid})")
+    @Insert("insert into like_statistics (like_flag,uid,pid) values (1,#{uid},#{pid})")
     void insertFlag(@Param("uid") String uid,@Param("pid") int pid);
 
     int updateByPrimaryKey(Post record);

@@ -3,7 +3,9 @@ package com.kris.prophecy.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.PageHelper;
 import com.kris.prophecy.entity.Message;
+import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.MessageMapper;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.MessageService;
 import com.kris.prophecy.utils.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,50 +24,44 @@ public class MessageServiceImpl implements MessageService {
     MessageMapper messageMapper;
 
     @Override
-    public JSONObject sendMessage(Message message) {
-        JSONObject jsonObject = new JSONObject();
+    public Response sendMessage(Message message) {
         int ret = messageMapper.insertSelective(message);
         if (ret > 0) {
-            jsonObject.put("response_msg", "通知发送成功");
+            return Response.message("通知发送成功");
         } else {
-            jsonObject.put("response_msg", "通知发送失败");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     @Override
-    public JSONObject deleteMessage(Message message) {
-        JSONObject jsonObject = new JSONObject();
+    public Response deleteMessage(Message message) {
         if (messageMapper.selectByPrimaryKey(message.getId()) == null
                 || messageMapper.selectByPrimaryKey(message.getId()).getFlag() == 0) {
-            jsonObject.put("response_msg", "该通知不存在");
-            return jsonObject;
+            return Response.error(UserErrorCode.MESSAGE_NOT_EXIST);
         }
         int ret = messageMapper.updateByPrimaryKeySelective(message);
         if (ret > 0) {
-            jsonObject.put("response_msg", "通知删除成功");
+            return Response.message("删除通知成功");
         } else {
-            jsonObject.put("response_msg", "删除通知失败");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     @Override
-    public PageData<Message> listMessage(Integer page, Integer pageSize, Integer readFlag, String uid) {
+    public Response listMessage(Integer page, Integer pageSize, Integer readFlag, String uid) {
         PageHelper.startPage(page, pageSize);
         List<Message> messageList = messageMapper.listMessage(uid, readFlag);
         PageData<Message> messagePageData = new PageData<>(messageList, pageSize);
-        return messagePageData;
+        return Response.ok(messagePageData);
     }
 
     @Override
-    public JSONObject readMessage(Integer id, Integer flag, String uid) {
+    public Response readMessage(Integer id, Integer flag, String uid) {
         JSONObject jsonObject = new JSONObject();
         if (flag == null) {
             List<Message> messageList = messageMapper.listMessage(uid, 0);
             if (messageList.isEmpty()) {
-                jsonObject.put("response_msg", "没有未读通知");
-                return jsonObject;
+                return Response.message("没有未读通知");
             }
             List<Integer> ids = new ArrayList<>();
             messageList.forEach(message -> {
@@ -73,24 +69,23 @@ public class MessageServiceImpl implements MessageService {
             });
             int ret = messageMapper.readAll(ids, uid);
             if (ret > 0) {
-                jsonObject.put("response_msg", "读取所有通知成功");
+                return Response.message("读取所有通知成功");
             } else {
-                jsonObject.put("response_msg", "读取所有通知失败");
+                return Response.error(UserErrorCode.FAIL);
             }
         } else if (flag == 1) {
             if (messageMapper.selectByPrimaryKey(id) == null) {
                 jsonObject.put("response_msg", "该通知不存在");
-                return jsonObject;
+                return Response.error(UserErrorCode.MESSAGE_NOT_EXIST);
             }
             int ret = messageMapper.insert(id, uid);
             if (ret > 0) {
-                jsonObject.put("response_msg", "读取该条通知成功");
+                return Response.message("读取该条通知成功");
             } else {
-                jsonObject.put("response_msg", "读取该条通知失败");
+                return Response.error(UserErrorCode.FAIL);
             }
         } else {
-            jsonObject.put("response_msg", "参数flag错误");
+            return Response.error(UserErrorCode.PARAM_FLAG_ERROR);
         }
-        return jsonObject;
     }
 }

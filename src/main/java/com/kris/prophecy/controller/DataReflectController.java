@@ -2,6 +2,7 @@ package com.kris.prophecy.controller;
 
 import com.kris.prophecy.enums.ServiceCode;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.reflect.InvokeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +25,11 @@ public class DataReflectController {
      * 用户填充服务
      */
     @GetMapping(value = "/addUser", produces = "application/json;charset=UTF-8")
-    public List<User> userReflect(HttpServletRequest request, @RequestHeader("uid") String uid, @RequestParam("frequency") long frequency) throws Throwable {
+    public Response userReflect(HttpServletRequest request, @RequestHeader("uid") String uid, @RequestParam("frequency") long frequency) throws Throwable {
         String rid = UUID.randomUUID().toString().replace("-", "");
         Object result = invokeService.serviceInvoke(request, ServiceCode.ADD_USER_REFLECT, rid, frequency);
         List<User> userList = (List<User>) result;
-        return userList;
+        return Response.ok(userList);
     }
 
 }

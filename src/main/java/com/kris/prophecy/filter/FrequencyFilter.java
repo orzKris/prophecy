@@ -48,8 +48,8 @@ public class FrequencyFilter implements Filter {
             response.setContentType("application/json;charset=UTF-8");
             Writer writer = response.getWriter();
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("response_code", "100005");
-            jsonObject.put("response_msg", "每分钟最多能发帖一次");
+            jsonObject.put("response_code", "20000012");
+            jsonObject.put("message", "每分钟最多能发帖一次");
             writer.write(jsonObject.toJSONString());
             writer.flush();
         } else {

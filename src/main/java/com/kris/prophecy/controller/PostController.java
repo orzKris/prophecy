@@ -5,6 +5,8 @@ import com.github.pagehelper.PageHelper;
 import com.kris.prophecy.entity.Post;
 import com.kris.prophecy.entity.PostDetail;
 import com.kris.prophecy.entity.PostOverview;
+import com.kris.prophecy.enums.UserErrorCode;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.PostService;
 import com.kris.prophecy.utils.PageData;
 import org.apache.commons.lang3.StringUtils;
@@ -31,15 +33,12 @@ public class PostController {
      * Param: title,content
      */
     @PostMapping(value = "/add", produces = "application/json;charset=UTF-8")
-    public JSONObject post(@RequestBody Post post, @RequestHeader("uid") String uid) {
-        JSONObject jsonObject = new JSONObject();
+    public Response post(@RequestBody Post post, @RequestHeader("uid") String uid) {
         if (StringUtils.isBlank(post.getContent()) || StringUtils.isBlank(post.getTitle())) {
-            jsonObject.put("response_msg", "缺少参数");
-            return jsonObject;
+            return Response.error(UserErrorCode.PARAM_ERROR);
         }
         if (post.getTitle().length() > TITLE_MAX_SIZE) {
-            jsonObject.put("response_msg", "标题字数不能超过15字");
-            return jsonObject;
+            return Response.error(UserErrorCode.TITLE_SIZE_ERROR);
         }
         post.setUid(uid);
         return postService.post(post);
@@ -50,11 +49,9 @@ public class PostController {
      * Param: id,content,rid
      */
     @PostMapping(value = "/reply", produces = "application/json;charset=UTF-8")
-    public JSONObject reply(@RequestBody Post post, @RequestHeader("uid") String uid) {
-        JSONObject jsonObject = new JSONObject();
+    public Response reply(@RequestBody Post post, @RequestHeader("uid") String uid) {
         if (post.getId() == null || StringUtils.isBlank(post.getContent())) {
-            jsonObject.put("response_msg", "缺少参数");
-            return jsonObject;
+            return Response.error(UserErrorCode.PARAM_ERROR);
         }
         post.setReplyUid(uid);
         return postService.reply(post);
@@ -65,16 +62,16 @@ public class PostController {
      * Param: title,content,start,end
      */
     @GetMapping(value = "/overview", produces = "application/json;charset=UTF-8")
-    public PageData<PostOverview> overviewList(Post post, @RequestParam(required = false) String start,
-                                               @RequestParam(required = false) String end,
-                                               @RequestParam(required = false) Integer page,
-                                               @RequestParam(required = false) Integer pageSize) {
+    public Response overviewList(Post post, @RequestParam(required = false) String start,
+                                 @RequestParam(required = false) String end,
+                                 @RequestParam(required = false) Integer page,
+                                 @RequestParam(required = false) Integer pageSize) {
         pageSize = (pageSize == null || pageSize < 0 ? 10 : pageSize);
         page = (page == null || page < 1 ? 1 : page);
         PageHelper.startPage(page, pageSize);
         List<PostOverview> postOverviews = postService.overviewList(post, start, end);
         PageData<PostOverview> postPageData = new PageData<>(postOverviews, pageSize);
-        return postPageData;
+        return Response.ok(postPageData);
     }
 
     /**
@@ -82,17 +79,23 @@ public class PostController {
      * Param: id
      */
     @GetMapping(value = "/detail", produces = "application/json;charset=UTF-8")
-    public JSONObject detailList(@RequestParam("id") Integer id,
-                                 @RequestParam(required = false) Integer page,
-                                 @RequestParam(required = false) Integer pageSize) {
+    public Response detailList(@RequestParam("id") Integer id,
+                               @RequestParam(required = false) Integer page,
+                               @RequestParam(required = false) Integer pageSize) {
         pageSize = (pageSize == null || pageSize < 0 ? 5 : pageSize);
         page = (page == null || page < 1 ? 1 : page);
         PageHelper.startPage(page, pageSize);
         List<PostDetail> postDetails = postService.detailList(id);
         PageData<PostDetail> postPageData = new PageData<>(postDetails, pageSize);
-        JSONObject jsonObject = postService.base(id);
-        jsonObject.put("detail",postPageData);
-        return jsonObject;
+        Response response = postService.base(id);
+
+        if (UserErrorCode.SUCCESS.getCode().equals(response.getResponseCode())) {
+            JSONObject jsonObject = (JSONObject) response.getResult();
+            jsonObject.put("detail", postPageData);
+            return Response.ok(jsonObject);
+        } else {
+            return response;
+        }
     }
 
     /**
@@ -100,7 +103,7 @@ public class PostController {
      * Param: id
      */
     @GetMapping(value = "/like", produces = "application/json;charset=UTF-8")
-    public JSONObject like(@RequestParam("id") Integer id, @RequestHeader("uid") String uid) {
+    public Response like(@RequestParam("id") Integer id, @RequestHeader("uid") String uid) {
         return postService.like(id, uid);
     }
 }

@@ -1,9 +1,9 @@
 package com.kris.prophecy.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Message;
+import com.kris.prophecy.enums.UserErrorCode;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.MessageService;
-import com.kris.prophecy.utils.PageData;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,11 +24,9 @@ public class MessageController {
      * Param: title,content
      */
     @PostMapping("/post")
-    public JSONObject notice(@RequestBody Message message, @RequestHeader("uid") String uid) {
-        JSONObject jsonObject = new JSONObject();
+    public Response notice(@RequestBody Message message, @RequestHeader("uid") String uid) {
         if (StringUtils.isBlank(message.getTitle()) || StringUtils.isBlank(message.getContent())) {
-            jsonObject.put("response_msg", "缺少参数");
-            return jsonObject;
+            return Response.error(UserErrorCode.PARAM_ERROR);
         }
         message.setUid("0");
         message.setPublisherUid(uid);
@@ -40,11 +38,9 @@ public class MessageController {
      * Param: id
      */
     @GetMapping("/delete")
-    public JSONObject delete(Message message, @RequestHeader("uid") String uid) {
-        JSONObject jsonObject = new JSONObject();
-        if (message.getId()==null){
-            jsonObject.put("response_msg","缺少参数");
-            return jsonObject;
+    public Response delete(Message message, @RequestHeader("uid") String uid) {
+        if (message.getId() == null) {
+            return Response.error(UserErrorCode.PARAM_ERROR);
         }
         return messageService.deleteMessage(message);
     }
@@ -54,13 +50,13 @@ public class MessageController {
      * Param: page,pageSize,readFlag(-NULL 所有消息，-0 未读消息，-1 已读消息）
      */
     @GetMapping("")
-    public PageData<Message> listMessage(@RequestHeader("uid") String uid,
-                                         @RequestParam(required = false) Integer page,
-                                         @RequestParam(required = false) Integer pageSize,
-                                         @RequestParam(required = false) Integer readFlag){
+    public Response listMessage(@RequestHeader("uid") String uid,
+                                @RequestParam(required = false) Integer page,
+                                @RequestParam(required = false) Integer pageSize,
+                                @RequestParam(required = false) Integer readFlag) {
         pageSize = (pageSize == null || pageSize < 0 ? 5 : pageSize);
         page = (page == null || page < 1 ? 1 : page);
-        return messageService.listMessage(page,pageSize,readFlag,uid);
+        return messageService.listMessage(page, pageSize, readFlag, uid);
     }
 
     /**
@@ -68,9 +64,9 @@ public class MessageController {
      * Param: id,flag(-1 读取单个消息 -NULL 读取所有消息)
      */
     @GetMapping("/read")
-    public JSONObject readMessage(@RequestHeader("uid") String uid,
-                                  @RequestParam(required = false) Integer id,
-                                  @RequestParam(required = false) Integer flag){
-        return messageService.readMessage(id,flag,uid);
+    public Response readMessage(@RequestHeader("uid") String uid,
+                                @RequestParam(required = false) Integer id,
+                                @RequestParam(required = false) Integer flag) {
+        return messageService.readMessage(id, flag, uid);
     }
 }

@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -35,22 +36,20 @@ public class MultiThreadScript {
 
     private HttpEntity<String> requestEntity;
 
-    private final static String HOME_PATH = "xxx";
-
-    private final static String COMPANY_PATH = "xxx";
+    private final static String PATH = "xxx";
 
     @Before
     public void init() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("uid", "876da611-a14a-3aa7-a28d-df43b332a923");
+        headers.add("uid", "0be1e377-50c4-4dc6-9100-9c3c7a734ca8");
         requestEntity = new HttpEntity<>(headers);
     }
 
     @Test
     public void dumpData() throws IOException {
         long start = System.currentTimeMillis();
-        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(COMPANY_PATH + "手机号1000.xls"));
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号1000.xls"));
         HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
         List<Future> futureList = new ArrayList<Future>();
         for (int i = 1; i <= sheet.getLastRowNum(); i++) {
@@ -77,7 +76,43 @@ public class MultiThreadScript {
                 e.printStackTrace();
             }
         }
-        FileOutputStream fileOutputStream = new FileOutputStream(COMPANY_PATH + "手机号归属地.xls");
+
+        FileOutputStream fileOutputStream = new FileOutputStream(PATH + "手机号归属地.xls");
+        hssfWorkbook.write(fileOutputStream);
+        fileOutputStream.flush();
+        System.out.println("cost: " + (System.currentTimeMillis() - start) + "ms");
+    }
+
+    @Test
+    public void dumpData2() throws IOException, InterruptedException {
+        long start = System.currentTimeMillis();
+        HSSFWorkbook hssfWorkbook = new HSSFWorkbook(new FileInputStream(PATH + "手机号1000.xls"));
+        HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
+        Collection<MyCallable> callableList = new ArrayList<>();
+        for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+            HSSFRow row = sheet.getRow(i);
+            String mobile = row.getCell(0).getStringCellValue();
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("mobile", mobile);
+            String param = jsonObject.toJSONString();
+            MyCallable callable = new MyCallable(param);
+            callableList.add(callable);
+        }
+        List<Future<String>> futures = threadPool.invokeAll(callableList);
+        threadPool.shutdown();
+
+        int i = 1;
+        for (Future future : futures) {
+            HSSFRow row = sheet.getRow(i);
+            try {
+                row.getCell(0).setCellValue((String) future.get());
+                i = i + 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        FileOutputStream fileOutputStream = new FileOutputStream(PATH + "手机号归属地.xls");
         hssfWorkbook.write(fileOutputStream);
         fileOutputStream.flush();
         System.out.println("cost: " + (System.currentTimeMillis() - start) + "ms");

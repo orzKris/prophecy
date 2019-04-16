@@ -49,8 +49,8 @@ public class ProphecyApplicationTests {
     @Test
     public void contextLoads() throws Exception {
         JSch jsch = new JSch();
-        String userName = "hekaiping";
-        String password = "hekaiping";
+        String userName = "xxx";
+        String password = "xxx";
         String host = "192.168.3.4";
         int port = 22;
         String cmd = "cd /usr/share/logstash/bin/ && ./logstash -f /usr/share/logstash/bin/input-config/court-annocement/sync-mysql.conf";
@@ -436,14 +436,6 @@ public class ProphecyApplicationTests {
         System.out.println(jsonObject.toString());
         System.out.println(json);
         System.out.println(JSON.toJSONString(JSON.parseObject(json), SerializerFeature.WriteMapNullValue));
-    }
-
-    @Test
-    public void listToJson() {
-        List<Result> results = new ArrayList<>();
-        results.add(new Result("test", "nice"));
-        results.add(new Result("play", "world"));
-        System.out.println(JSON.toJSONString(results));
     }
 
     @Test

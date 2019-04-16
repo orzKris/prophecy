@@ -2,11 +2,12 @@ package com.kris.prophecy.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.config.ApplicationContextRegister;
+import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.enums.RequestConstant;
-import com.kris.prophecy.enums.ResponseConstant;
 import com.kris.prophecy.model.Result;
 import com.kris.prophecy.model.CallMap;
 import com.kris.prophecy.framework.ConcurrentCallable;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.InterfaceUsageService;
 import com.kris.prophecy.utils.LogUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -50,25 +51,25 @@ public class ConcurrentController {
             new BasicThreadFactory.Builder().namingPattern("Schedule-thread-pool-%d").daemon(true).build());
 
     @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Result main(HttpServletRequest request, @PathVariable("id") String id) {
+    public Response main(HttpServletRequest request, @PathVariable("id") String id) {
         long start = System.currentTimeMillis();
         DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String param = request.getParameter(RequestConstant.PARAM);
         String uid = request.getHeader(RequestConstant.UID);
 
-        Result paramResult = checkParam(param, uid, requestTime);
-        if (!paramResult.getStatus().equals(ResponseConstant.SUCCESS)) {
+        Response paramResult = checkParam(param, uid, requestTime);
+        if (!paramResult.getResponseCode().equals(DataErrorCode.SUCCESS.getCode())) {
             return paramResult;
         }
-        JSONObject paramJson = paramResult.getJsonResult();
+        JSONObject paramJson = (JSONObject) paramResult.getResult();
         if (paramJson.containsKey(RequestConstant.FILE_UPLOAD)) {
             InputStream inputStream = obtainFile(request, uid, requestTime);
             paramJson.put(RequestConstant.FILE, inputStream);
         }
         String serviceName = callMap.getMap().get(id);
         if (serviceName == null) {
-            return new Result(RequestConstant.NO_CONFIGURED_SERVICE);
+            return Response.error(DataErrorCode.NO_CONFIGURED_SERVICE);
         }
         paramJson.put(RequestConstant.UID, uid);
         LogUtil.logInfo(uid, "调用的服务有：" + serviceName);
@@ -77,9 +78,9 @@ public class ConcurrentController {
         ConcurrentCallable concurrentCallable = (ConcurrentCallable) applicationContextRegister.getApplicationContext().getBean(serviceName);
         concurrentCallable.init(paramJson);
         Result checkResult = concurrentCallable.checkParam(paramJson);
-        if (ResponseConstant.PARAM_ERROR.equals(checkResult.getStatus())) {
+        if (DataErrorCode.PARAM_ERROR.equals(checkResult.getStatus())) {
             checkResult.setName(serviceName);
-            return checkResult;
+            return new Response<>(checkResult.getStatus().getCode(),checkResult.getStatus().getErrorMsg(),checkResult.toJson());
         }
         Future<Result> future = executorCompletionService.submit(concurrentCallable);
         Result result = new Result();
@@ -87,37 +88,28 @@ public class ConcurrentController {
             result = future.get(20000, TimeUnit.MILLISECONDS);
             result.setName(serviceName);
             LogUtil.logInfo(uid, result.getJsonResult().toJSONString());
-            return result;
+            return new Response<>(result.getStatus().getCode(), result.getStatus().getErrorMsg(), result.toJson());
+
         } catch (TimeoutException e) {
-            return new Result(serviceName, ResponseConstant.DISPATCH_TIMEOUT);
+            return Response.error(DataErrorCode.DISPATCH_TIMEOUT);
         } catch (Exception e) {
-            result = new Result(serviceName, ResponseConstant.FAIL);
-            JSONObject jsonResult = new JSONObject();
-            jsonResult.put(ResponseConstant.RESPONSE, ResponseConstant.DISPATCH_ERROR);
-            result.setJsonResult(jsonResult);
-            LogUtil.logError(uid, requestTime, param, RequestConstant.SERVICE_PROCESS_ERROR, e);
-            return result;
+            return Response.error(DataErrorCode.DISPATCH_ERROR);
         } finally {
-            interfaceUsageService.insertInterfaceUsage(start, request.getRequestURI(), param, uid, result.getStatus());
+            interfaceUsageService.insertInterfaceUsage(start, request.getRequestURI(), param, uid, result.getStatus().getCode());
         }
     }
 
-    private Result checkParam(String param, String uid, String requestTime) {
-        JSONObject paramJson = new JSONObject();
-        Result result = new Result(ResponseConstant.SUCCESS);
+    private Response checkParam(String param, String uid, String requestTime) {
         if (StringUtils.isBlank(param)) {
-            paramJson.put(ResponseConstant.RESPONSE, RequestConstant.PARAM_LESS);
-            return new Result(ResponseConstant.PARAM_ERROR, paramJson);
+            return Response.error(DataErrorCode.PARAM_ERROR);
         }
         param = param.replaceAll(" ", "");
+
         try {
-            paramJson = JSONObject.parseObject(param);
-            result.setJsonResult(paramJson);
-            return result;
+            return Response.ok(JSONObject.parseObject(param));
         } catch (Exception e) {
             LogUtil.logError(uid, requestTime, param, RequestConstant.PARAM_MUST_BE_JSON, e);
-            paramJson.put(ResponseConstant.RESPONSE, RequestConstant.PARAM_MUST_BE_JSON);
-            return new Result(ResponseConstant.PARAM_ERROR, paramJson);
+            return Response.error(DataErrorCode.PARAM_ERROR);
         }
     }
 
@@ -126,7 +118,9 @@ public class ConcurrentController {
         try {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = multipartRequest.getFile("file");
-            inputStream = multipartFile.getInputStream();
+            if (multipartFile != null) {
+                inputStream = multipartFile.getInputStream();
+            }
         } catch (Exception e) {
             LogUtil.logError(uid, requestTime, request.toString(), RequestConstant.FILE_UPLOAD_FAIL, e);
         }
