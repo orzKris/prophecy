@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class DataOutputScript {
 
-    private final static String PATH = "C:\\Users\\huyan\\Desktop\\";
+    private final static String PATH = "xxx";
 
     public static Request getRequest(JSONObject param) {
         return new Request.Builder()
