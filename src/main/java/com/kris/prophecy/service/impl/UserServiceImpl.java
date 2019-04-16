@@ -2,7 +2,9 @@ package com.kris.prophecy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.UserMapper;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -24,51 +26,41 @@ public class UserServiceImpl implements UserService {
      * 注册功能
      */
     @Override
-    public JSONObject register(User user) {
+    public Response register(User user) {
         if (userMapper.selectByName(user.getName()) != null) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("response_msg", "该用户已经注册");
-            return jsonObject;
+            return Response.error(UserErrorCode.USER_ALREADY_EXIST);
         }
-        String uid = UUID.randomUUID() + "";
+        String uid = UUID.nameUUIDFromBytes(user.getName().getBytes()).toString();
         user.setUid(uid);
         int ret = userMapper.insertSelective(user);
-        JSONObject jsonObject = new JSONObject();
         if (ret > 0) {
-            jsonObject.put("response_msg", "注册成功！");
+            return Response.message("注册成功");
         } else {
-            jsonObject.put("response_msg", "注册失败！");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     /**
      * 登录功能
      */
     @Override
-    public JSONObject login(String name, String password) {
-        JSONObject jsonObject = new JSONObject();
+    public Response login(String name, String password) {
         if (userMapper.selectLogin(name, password) == null) {
-            jsonObject.put("response_msg", "用户名或密码错误！");
-            return jsonObject;
+            return Response.error(UserErrorCode.LOGIN_ERROR);
         }
-        jsonObject.put("response_msg", "登陆成功，好久不见呀! " + name + "同学");
-        return jsonObject;
+        return Response.message("登陆成功");
     }
 
     /**
      * 用户信息查询
      */
     @Override
-    public JSONObject getUser(String name) {
-        JSONObject jsonObject = new JSONObject();
+    public Response getUser(String name) {
         if (userMapper.selectByName(name) == null) {
-            jsonObject.put("response_msg", "该用户不存在！");
-            return jsonObject;
+            return Response.error(UserErrorCode.USER_NOT_EXIST);
         }
         User user = userMapper.selectByName(name);
-        jsonObject.put("response_msg", user);
-        return jsonObject;
+        return Response.ok(user);
     }
 
     /**
@@ -76,7 +68,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<User> getSchool(User user, Pageable pageable) {
-        List<User> userList = userMapper.selectList(user,pageable);
+        List<User> userList = userMapper.selectList(user, pageable);
         return userList;
     }
 
@@ -92,15 +84,13 @@ public class UserServiceImpl implements UserService {
      * 用户信息更新
      */
     @Override
-    public JSONObject userUpdate(User user, String uid) {
+    public Response userUpdate(User user, String uid) {
         user.setUid(uid);
         int ret = userMapper.updateByUidSelective(user);
-        JSONObject jsonObject = new JSONObject();
         if (ret > 0) {
-            jsonObject.put("response_msg", "用户信息更新成功！");
+            return Response.message("用户信息更新成功");
         } else {
-            jsonObject.put("response_msg", "用户信息更新失败！");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 }

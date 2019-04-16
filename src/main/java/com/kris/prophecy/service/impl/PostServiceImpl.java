@@ -2,10 +2,13 @@ package com.kris.prophecy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Post;
+import com.kris.prophecy.entity.User;
+import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.PostMapper;
 import com.kris.prophecy.mapper.UserMapper;
 import com.kris.prophecy.entity.PostDetail;
 import com.kris.prophecy.entity.PostOverview;
+import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,11 +29,6 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private UserMapper userMapper;
 
-    public PostServiceImpl(PostMapper postMapper, UserMapper userMapper) {
-        this.postMapper = postMapper;
-        this.userMapper = userMapper;
-    }
-
     /**
      * 帖子内容概览的最大字符长度
      */
@@ -40,38 +38,32 @@ public class PostServiceImpl implements PostService {
      * 发帖
      */
     @Override
-    public JSONObject post(Post post) {
+    public Response post(Post post) {
         int ret = postMapper.insertSelective(post);
-        JSONObject jsonObject = new JSONObject();
         if (ret > 0) {
-            jsonObject.put("response_msg", "发帖成功");
+            return Response.message("发帖成功");
         } else {
-            jsonObject.put("response_msg", "发帖失败");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     /**
      * 回复帖子
      */
     @Override
-    public JSONObject reply(Post post) {
-        JSONObject jsonObject = new JSONObject();
+    public Response reply(Post post) {
         if (postMapper.selectByPrimaryKey(post.getId()) == null) {
-            jsonObject.put("response_msg", "该帖子不存在");
-            return jsonObject;
+            return Response.error(UserErrorCode.POST_NOT_EXIST);
         }
         if (post.getRid() != null && !postMapper.selectByRid(post.getRid()).equals(post.getId())) {
-            jsonObject.put("response_msg", "帖子与回复不匹配");
-            return jsonObject;
+            return Response.error(UserErrorCode.POST_NOT_MATCH);
         }
         int ret = postMapper.insertReply(post);
         if (ret > 0) {
-            jsonObject.put("response_msg", "回复成功");
+            return Response.message("回复成功");
         } else {
-            jsonObject.put("response_msg", "回复失败");
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     /**
@@ -132,45 +124,45 @@ public class PostServiceImpl implements PostService {
      * 点赞接口
      */
     @Override
-    public JSONObject like(Integer id, String uid) {
-        JSONObject jsonObject = new JSONObject();
+    public Response like(Integer id, String uid) {
         Post post = new Post();
         post.setId(id);
         if (postMapper.selectByPrimaryKey(id) == null) {
-            jsonObject.put("response_msg", "该帖子不存在");
-            return jsonObject;
+            return Response.error(UserErrorCode.POST_NOT_EXIST);
         }
         if (postMapper.getLikeFlag(uid, id) == null) {
             postMapper.insertFlag(uid, id);
             postMapper.plusByPrimaryKeySelective(post);
-            jsonObject.put("response_msg", "点赞成功");
+            return Response.message("点赞成功");
+
         } else if (postMapper.getLikeFlag(uid, id) == 0) {
             postMapper.updateLikeFlag(uid, id);
             postMapper.plusByPrimaryKeySelective(post);
-            jsonObject.put("response_msg", "点赞成功");
+            return Response.message("点赞成功");
+
         } else if (postMapper.getLikeFlag(uid, id) == 1) {
             postMapper.updateFlag(uid, id);
             postMapper.minusByPrimaryKeySelective(post);
-            jsonObject.put("response_msg", "取消点赞");
+            return Response.message("取消点赞");
+        } else {
+            return Response.error(UserErrorCode.FAIL);
         }
-        return jsonObject;
     }
 
     /**
      * 帖子基本信息获取
      */
     @Override
-    public JSONObject base(Integer id) {
+    public Response base(Integer id) {
         JSONObject jsonObject = new JSONObject();
         if (postMapper.selectByPrimaryKey(id) == null) {
-            jsonObject.put("response_msg", "该帖子不存在");
-            return jsonObject;
+            return Response.error(UserErrorCode.POST_NOT_EXIST);
         }
         Post post = postMapper.selectByPrimaryKey(id);
         String name = userMapper.selectByUid(post.getUid()).getName();
         jsonObject.put("title", post.getTitle());
         jsonObject.put("content", post.getContent());
         jsonObject.put("name", name);
-        return jsonObject;
+        return Response.ok(jsonObject);
     }
 }

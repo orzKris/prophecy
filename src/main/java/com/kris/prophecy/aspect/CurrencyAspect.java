@@ -3,6 +3,7 @@ package com.kris.prophecy.aspect;
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.VirtualCurrency;
 import com.kris.prophecy.mapper.UserMapper;
+import com.kris.prophecy.model.common.util.Response;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -29,23 +30,25 @@ public class CurrencyAspect {
      * 接口调用统计
      */
     @Around("balanceExecution()")
-    public JSONObject timeAround(ProceedingJoinPoint proceedingJoinPoint) {
+    public Response timeAround(ProceedingJoinPoint proceedingJoinPoint) {
         Object[] args;
         args = proceedingJoinPoint.getArgs();
-        JSONObject response = new JSONObject();
+        Response response = new Response();
 
         try {
-            response = (JSONObject) proceedingJoinPoint.proceed();
+            response = (Response) proceedingJoinPoint.proceed();
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
-
         VirtualCurrency virtualCurrency = (VirtualCurrency) args[0];
         String uid = (String) args[1];
-        response.put("uid", uid);
-        response.put("accountName", virtualCurrency.getAccountName());
-        response.put("transaction", virtualCurrency.getTransaction());
-        response.put("balance", userMapper.selectByUid(uid).getBalance());
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", uid);
+        jsonObject.put("accountName", virtualCurrency.getAccountName());
+        jsonObject.put("transaction", virtualCurrency.getTransaction());
+        jsonObject.put("balance", userMapper.selectByUid(uid).getBalance());
+        response = new Response<>(response.getResponseCode(), response.getMessage(), jsonObject);
         return response;
     }
 }

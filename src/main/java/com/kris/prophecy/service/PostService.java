@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Post;
 import com.kris.prophecy.entity.PostDetail;
 import com.kris.prophecy.entity.PostOverview;
+import com.kris.prophecy.model.common.util.Response;
 
 import java.util.List;
 
@@ -16,12 +17,12 @@ public interface PostService {
     /**
      * 发帖
      */
-    JSONObject post(Post post);
+    Response post(Post post);
 
     /**
      * 回复帖子
      */
-    JSONObject reply(Post post);
+    Response reply(Post post);
 
     /**
      * 帖子概览列表
@@ -36,10 +37,10 @@ public interface PostService {
     /**
      * 点赞接口
      */
-    JSONObject like(Integer id,String uid);
+    Response like(Integer id, String uid);
 
     /**
      * 获取帖子基本信息
      */
-    JSONObject base(Integer id);
+    Response base(Integer id);
 }

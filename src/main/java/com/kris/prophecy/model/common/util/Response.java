@@ -16,7 +16,7 @@ public class Response<T> {
 
     private T result;
 
-    private String message = "success";
+    private String message = "成功";
 
     private String traceId;
 
@@ -35,7 +35,7 @@ public class Response<T> {
     }
 
     public static <T> Response<T> ok(T result) {
-        return new Response("00", "success", result);
+        return new Response("00", "成功", result);
     }
 
     public static Response error(ErrorCode errorCode, Object... params) {
@@ -52,7 +52,7 @@ public class Response<T> {
     }
 
     public static Response message() {
-        return message("success");
+        return message("成功");
     }
 
     public String getResponseCode() {

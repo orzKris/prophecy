@@ -2,6 +2,7 @@ package com.kris.prophecy.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.model.common.util.Response;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -14,17 +15,17 @@ public interface UserService {
     /**
      * 注册
      */
-    JSONObject register(User user);
+    Response register(User user);
 
     /**
      * 登录
      */
-    JSONObject login(String name, String password);
+    Response login(String name, String password);
 
     /**
      * 用户名查询用户信息
      */
-    JSONObject getUser(String name);
+    Response getUser(String name);
 
     /**
      * 校名查询用户信息
@@ -39,5 +40,5 @@ public interface UserService {
     /**
      * 用户信息更新
      */
-    JSONObject userUpdate(User user, String uid);
+    Response userUpdate(User user, String uid);
 }
