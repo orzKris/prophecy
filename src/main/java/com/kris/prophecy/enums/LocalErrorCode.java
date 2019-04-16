@@ -1,5 +1,6 @@
 package com.kris.prophecy.enums;
 
+
 import com.kris.prophecy.model.common.exception.ErrorCode;
 
 /**
