@@ -30,6 +30,11 @@ public class Result {
         this.status = status;
     }
 
+    public Result(DataErrorCode status, String contentNotParsed) {
+        this.status = status;
+        this.contentNotParsed = contentNotParsed;
+    }
+
     public Result(DataErrorCode status, JSONObject jsonResult) {
         this.status = status;
         this.jsonResult = jsonResult;

@@ -23,7 +23,7 @@ public class LogUtil {
 
     public static void logError(String uid, String requestTime, String conditionMessage, String errorMessage, Exception e) {
         log.error("[TRACE_ERROR]: uid={},request_time={},{},{},{} ",
-                uid, requestTime, conditionMessage, errorMessage, Optional.ofNullable(e).orElse(new RuntimeException("查询结果数据异常")));
+                uid, requestTime, conditionMessage, errorMessage, e);
     }
 
     public static void logInfoElasticSearch(String uid, long start, String conditionMessage) {
@@ -38,10 +38,15 @@ public class LogUtil {
                 uid, responseBody, start, end, end - start, conditionMessage);
     }
 
-    public static void logInfoRedis(String uid, String responseBody, long start, String conditionMessage) {
+    public static void logInfoRedis(String responseBody, long start, String conditionMessage) {
         long end = System.currentTimeMillis();
-        log.info("[TRACE_REDIS]: uid={},response_body={},request_time={},response_time={},spend {} ms,{}",
-                uid, responseBody, start, end, end - start, conditionMessage);
+        log.info("[TRACE_REDIS]: response_body={},request_time={},response_time={},spend {} ms,{}",
+                responseBody, start, end, end - start, conditionMessage);
+    }
+
+    public static void logInfoRedisFallBack(String conditionMessage) {
+        long end = System.currentTimeMillis();
+        log.info("[TRACE_REDIS_FALLBACK]:{}", conditionMessage);
     }
 
     public static void logInfoMongo(String uid, String responseBody, long start, String conditionMessage) {

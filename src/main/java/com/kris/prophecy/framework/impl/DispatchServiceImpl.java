@@ -95,7 +95,7 @@ public class DispatchServiceImpl implements DispatchService {
         } catch (Exception e) {
             return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.FAIL, jsonResult, DataFromEnum.DATA_FROM_REDIS);
         } finally {
-            LogUtil.logInfoRedis("调度服务", responseBody, start, dispatchRequest.getRequestParam().toJSONString());
+            LogUtil.logInfoRedis(responseBody, start, dispatchRequest.getRequestParam().toJSONString());
         }
     }
 }
