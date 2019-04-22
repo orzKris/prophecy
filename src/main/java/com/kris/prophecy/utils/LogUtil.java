@@ -12,18 +12,16 @@ import java.util.Optional;
 @Log4j2
 public class LogUtil {
 
-    public static void logInfo(String uid, String conditionMessage) {
-        log.info("[TRACE_INFO]: uid={},{}", uid, conditionMessage);
+    public static void logInfo(String conditionMessage) {
+        log.info("[TRACE_INFO]: {}", conditionMessage);
     }
 
-    public static void logWarn(String uid, String requestTime, String conditionMessage, String errorMessage) {
-        log.error("[TRACE_WARN]: uid={},request_time={},{},{} ",
-                uid, requestTime, conditionMessage, errorMessage);
+    public static void logWarn(String requestTime, String conditionMessage, String errorMessage) {
+        log.error("[TRACE_WARN]: request_time={},{},{} ", requestTime, conditionMessage, errorMessage);
     }
 
-    public static void logError(String uid, String requestTime, String conditionMessage, String errorMessage, Exception e) {
-        log.error("[TRACE_ERROR]: uid={},request_time={},{},{},{} ",
-                uid, requestTime, conditionMessage, errorMessage, e);
+    public static void logError(String requestTime, String conditionMessage, String errorMessage, Exception e) {
+        log.error("[TRACE_ERROR]: request_time={},{},{},{} ", requestTime, conditionMessage, errorMessage, e);
     }
 
     public static void logInfoElasticSearch(String uid, long start, String conditionMessage) {
@@ -32,10 +30,14 @@ public class LogUtil {
                 uid, start, end, end - start, conditionMessage);
     }
 
-    public static void logInfo3rd(String uid, String responseBody, long start, String conditionMessage) {
+    public static void logInfo3rd(String responseBody, long start, String conditionMessage) {
         long end = System.currentTimeMillis();
-        log.info("[TRACE_3RD]: uid={},response_body={},request_time={},response_time={},spend {} ms,{}",
-                uid, responseBody, start, end, end - start, conditionMessage);
+        log.info("[TRACE_3RD]: response_body={},request_time={},response_time={},spend {} ms,{}",
+                responseBody, start, end, end - start, conditionMessage);
+    }
+
+    public static void logInfo3rdFallBack(String conditionMessage) {
+        log.info("[TRACE_3RD_FALLBACK]: {}", conditionMessage);
     }
 
     public static void logInfoRedis(String responseBody, long start, String conditionMessage) {
@@ -45,7 +47,6 @@ public class LogUtil {
     }
 
     public static void logInfoRedisFallBack(String conditionMessage) {
-        long end = System.currentTimeMillis();
         log.info("[TRACE_REDIS_FALLBACK]:{}", conditionMessage);
     }
 

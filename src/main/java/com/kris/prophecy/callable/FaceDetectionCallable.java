@@ -72,7 +72,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
         try {
             return getData(base64data);
         } catch (Exception e) {
-            LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, base64data, "请求旷视人脸检测接口失败", e);
+            LogUtil.logError(requestTime, base64data, "请求旷视人脸检测接口失败", e);
             return new Result(DataErrorCode.FAIL);
         }
     }
@@ -122,7 +122,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
             }
             data = swapStream.toByteArray();
         } catch (IOException e) {
-            LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, inputStream.toString(), "base64 encode exception", e);
+            LogUtil.logError(requestTime, inputStream.toString(), "base64 encode exception", e);
         } finally {
             if (inputStream != null) {
                 inputStream.close();

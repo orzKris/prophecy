@@ -83,7 +83,7 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
         } catch (InvocationTargetException e) {
             return this.exceptionHandler(tag, uid, rid, requestTime, interfaceUsage, e);
         } catch (Exception e) {
-            LogUtil.logError(uid, requestTime, conditionMessage, e.getMessage(), e);
+            LogUtil.logError(requestTime, conditionMessage, e.getMessage(), e);
             interfaceUsage.setStatus(DataErrorCode.FAIL.getCode());
             interfaceUsage.setFailMessage(e.getMessage().replace("'", ""));
             throw e;
@@ -101,13 +101,13 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
         boolean cause = throwable.getCause() != null &&
                 (throwable.getCause() instanceof RejectedException || throwable.getCause().getCause() instanceof RejectedException);
         if (throwable instanceof RejectedException) {
-            LogUtil.logError(uid, start, conditionMessage, "访问频率过高!", e);
+            LogUtil.logError(start, conditionMessage, "访问频率过高!", e);
         } else if (cause) {
-            LogUtil.logError(uid, start, conditionMessage, e.getCause().getMessage(), e);
+            LogUtil.logError(start, conditionMessage, e.getCause().getMessage(), e);
             interfaceUsage.setFailMessage("访问频率过高!");
             throw new RejectedException();
         } else {
-            LogUtil.logError(uid, start, conditionMessage, "Service层调用异常", e);
+            LogUtil.logError(start, conditionMessage, "Service层调用异常", e);
         }
         interfaceUsage.setFailMessage(throwable.getMessage().replace("'", ""));
         throw throwable;
@@ -115,7 +115,7 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
 
     private void addUsageLog(HttpServletRequest request, InterfaceUsage interfaceUsage, long start, String tag, String rid) {
         String conditionMessage = String.format("tag=%s,rid=%s", tag, rid);
-        LogUtil.logInfo(interfaceUsage.getUid(), conditionMessage);
+        LogUtil.logInfo(conditionMessage);
         String uri = request.getRequestURI();
         interfaceUsage.setArgs(conditionMessage);
         interfaceUsage.setUri(uri);

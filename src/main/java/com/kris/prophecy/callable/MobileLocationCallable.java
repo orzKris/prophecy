@@ -69,7 +69,7 @@ public class MobileLocationCallable implements ConcurrentCallable {
         try {
             return getData(mobile);
         } catch (Exception e) {
-            LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, conditionMessage, "请求手机归属地接口失败", e);
+            LogUtil.logError(requestTime, conditionMessage, "请求手机归属地接口失败", e);
             return new Result(DataErrorCode.FAIL);
         }
     }

@@ -58,13 +58,13 @@ public class ConcurrentController {
         String param = request.getParameter(RequestConstant.PARAM);
         String uid = request.getHeader(RequestConstant.UID);
 
-        Response paramResult = checkParam(param, uid, requestTime);
+        Response paramResult = checkParam(param, requestTime);
         if (!paramResult.getResponseCode().equals(DataErrorCode.SUCCESS.getCode())) {
             return paramResult;
         }
         JSONObject paramJson = (JSONObject) paramResult.getResult();
         if (paramJson.containsKey(RequestConstant.FILE_UPLOAD)) {
-            InputStream inputStream = obtainFile(request, uid, requestTime);
+            InputStream inputStream = obtainFile(request, requestTime);
             paramJson.put(RequestConstant.FILE, inputStream);
         }
         String serviceName = callMap.getMap().get(id);
@@ -72,7 +72,7 @@ public class ConcurrentController {
             return Response.error(DataErrorCode.NO_CONFIGURED_SERVICE);
         }
         paramJson.put(RequestConstant.UID, uid);
-        LogUtil.logInfo(uid, "调用的服务有：" + serviceName);
+        LogUtil.logInfo("调用的服务有：" + serviceName);
         //执行配置的服务
         CompletionService<Result> executorCompletionService = new ExecutorCompletionService<>(SCHEDULED_EXECUTOR_SERVICE);
         ConcurrentCallable concurrentCallable = (ConcurrentCallable) applicationContextRegister.getApplicationContext().getBean(serviceName);
@@ -80,14 +80,14 @@ public class ConcurrentController {
         Result checkResult = concurrentCallable.checkParam(paramJson);
         if (DataErrorCode.PARAM_ERROR.equals(checkResult.getStatus())) {
             checkResult.setName(serviceName);
-            return new Response<>(checkResult.getStatus().getCode(),checkResult.getStatus().getErrorMsg(),checkResult.toJson());
+            return new Response<>(checkResult.getStatus().getCode(), checkResult.getStatus().getErrorMsg(), checkResult.toJson());
         }
         Future<Result> future = executorCompletionService.submit(concurrentCallable);
         Result result = new Result();
         try {
             result = future.get(20000, TimeUnit.MILLISECONDS);
             result.setName(serviceName);
-            LogUtil.logInfo(uid, result.getJsonResult().toJSONString());
+            LogUtil.logInfo(result.getJsonResult().toJSONString());
             return new Response<>(result.getStatus().getCode(), result.getStatus().getErrorMsg(), result.toJson());
 
         } catch (TimeoutException e) {
@@ -99,7 +99,7 @@ public class ConcurrentController {
         }
     }
 
-    private Response checkParam(String param, String uid, String requestTime) {
+    private Response checkParam(String param, String requestTime) {
         if (StringUtils.isBlank(param)) {
             return Response.error(DataErrorCode.PARAM_ERROR);
         }
@@ -108,12 +108,12 @@ public class ConcurrentController {
         try {
             return Response.ok(JSONObject.parseObject(param));
         } catch (Exception e) {
-            LogUtil.logError(uid, requestTime, param, RequestConstant.PARAM_MUST_BE_JSON, e);
+            LogUtil.logError(requestTime, param, RequestConstant.PARAM_MUST_BE_JSON, e);
             return Response.error(DataErrorCode.PARAM_ERROR);
         }
     }
 
-    private InputStream obtainFile(HttpServletRequest request, String uid, String requestTime) {
+    private InputStream obtainFile(HttpServletRequest request, String requestTime) {
         InputStream inputStream = null;
         try {
             MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
@@ -122,7 +122,7 @@ public class ConcurrentController {
                 inputStream = multipartFile.getInputStream();
             }
         } catch (Exception e) {
-            LogUtil.logError(uid, requestTime, request.toString(), RequestConstant.FILE_UPLOAD_FAIL, e);
+            LogUtil.logError(requestTime, request.toString(), RequestConstant.FILE_UPLOAD_FAIL, e);
         }
         return inputStream;
     }

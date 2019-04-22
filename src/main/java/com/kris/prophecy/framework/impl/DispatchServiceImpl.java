@@ -78,7 +78,7 @@ public class DispatchServiceImpl implements DispatchService {
             }
             return result;
         } finally {
-            LogUtil.logInfo3rd("调度服务", responseBody, start, dispatchRequest.getRequestParam().toJSONString());
+            LogUtil.logInfo3rd(responseBody, start, dispatchRequest.getRequestParam().toJSONString());
             mongoService.asyncInsert(new DataCenter(dispatchRequest.getKey(), responseBody));
         }
     }

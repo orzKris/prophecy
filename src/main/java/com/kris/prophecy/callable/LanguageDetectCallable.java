@@ -69,11 +69,11 @@ public class LanguageDetectCallable implements ConcurrentCallable {
             String lang = dictionaryConversion(jsonResult);
             jsonResult.put(LanguageDetectConstant.LANGUAGE_TYPE, lang);
             result.setJsonResult(jsonResult);
-            LogUtil.logInfo3rd(uid, result.getJsonResult().toString(), start, text);
+            LogUtil.logInfo3rd(result.getJsonResult().toString(), start, text);
             result.setDataFrom(DataFromEnum.DATA_FROM_DATASOURCE);
             return result;
         } catch (Exception e) {
-            LogUtil.logError(uid, requestTime, text, "请求百度语言识别接口失败", e);
+            LogUtil.logError(requestTime, text, "请求百度语言识别接口失败", e);
             return new Result(DataErrorCode.FAIL);
         } finally {
             paramJson.remove(RequestConstant.UID);

@@ -253,7 +253,7 @@ public class ProphecyApplicationTests {
             String test = null;
             test.contains("aaa");
         } catch (NullPointerException e) {
-            LogUtil.logError("kris", "", "", "调用空对象的实例方法抛出空指针异常", e);
+            LogUtil.logError("", "", "调用空对象的实例方法抛出空指针异常", e);
         }
     }
     /**
@@ -439,14 +439,15 @@ public class ProphecyApplicationTests {
     }
 
     @Test
-    public void JsonToMap(){
+    public void JsonToMap() {
         JSONObject obj = new JSONObject();
         {
             obj.put("key1", "value1");
             obj.put("key2", "value2");
             obj.put("key3", "value3");
         }
-        Map<String, String> params = JSONObject.parseObject(obj.toJSONString(), new TypeReference<Map<String, String>>(){});
+        Map<String, String> params = JSONObject.parseObject(obj.toJSONString(), new TypeReference<Map<String, String>>() {
+        });
         System.out.println(params);
     }
 

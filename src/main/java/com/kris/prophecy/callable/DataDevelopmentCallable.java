@@ -79,7 +79,7 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
                 jsonResult.put(DataDevelopmentConstant.COUNT, mongoService.count());
             }
         } catch (Exception e) {
-            LogUtil.logError(paramJson.getString(RequestConstant.UID), requestTime, conditionMessage, "大数据输出失败", e);
+            LogUtil.logError(requestTime, conditionMessage, "大数据输出失败", e);
             return new Result(DataErrorCode.FAIL);
         }
         jsonResult.put(DataDevelopmentConstant.RESULT_ARRAY, jsonArray);
