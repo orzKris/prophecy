@@ -82,7 +82,7 @@ public class MobileLocationCallable implements ConcurrentCallable {
         DispatchRequest dispatchRequest = DispatchRequest.builder()
                 .isEnable(isEnable)
                 .okHttpClient(new OkHttpClient())
-                .dsId(ServiceIdEnum.D005.getId())
+                .callId(ServiceIdEnum.D005.getId())
                 .requestParam(queryString)
                 .request(getRequest(queryString))
                 .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D005.getId()))

@@ -30,7 +30,6 @@ public class RedisServiceImpl implements RedisService {
             return jedis.get(key);
         } catch (Exception e) {
             log.info("redis get value error");
-            e.printStackTrace();
             return null;
         } finally {
             returnResource(jedis);
@@ -51,7 +50,6 @@ public class RedisServiceImpl implements RedisService {
             jedis.expire(key, seconds);
         } catch (Exception e) {
             log.info("redis set value error");
-            e.printStackTrace();
         } finally {
             returnResource(jedis);
         }
@@ -73,7 +71,6 @@ public class RedisServiceImpl implements RedisService {
             log.info("Success to asyncInsert redis, key: {}, value: {}, seconds: {}", key, value, seconds);
         } catch (Exception e) {
             log.info("redis asyncSet value error");
-            e.printStackTrace();
         } finally {
             returnResource(jedis);
         }
@@ -88,7 +85,6 @@ public class RedisServiceImpl implements RedisService {
                 jedis.close();
             } catch (Exception e) {
                 log.error("Fail to close jedis", e);
-                e.printStackTrace();
             }
         }
     }

@@ -19,7 +19,5 @@ public interface DispatchService {
      */
     Result dispatch(DispatchRequest req, boolean isParsed) throws IOException;
 
-    Result dispatchCache(DispatchRequest req) throws IOException;
-
     Result dispatchDatasource(DispatchRequest req, boolean isParsed) throws IOException;
 }

@@ -27,8 +27,6 @@ public class RedisHystrixCommand extends HystrixCommand<Result> {
     @Autowired
     private JedisPool jedisPool;
 
-    private String queryKey;
-
     private DispatchRequest dispatchRequest;
 
     public RedisHystrixCommand() {
@@ -36,8 +34,11 @@ public class RedisHystrixCommand extends HystrixCommand<Result> {
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
                         .withMetricsRollingStatisticalWindowInMilliseconds(5000)
                         .withExecutionTimeoutInMilliseconds(1500)
-                        .withCircuitBreakerRequestVolumeThreshold(100)
+                        //熔断器在整个统计时间内是否开启的阀值，默认20秒。也就是10秒钟内至少请求20次，熔断器才发挥起作用
+                        .withCircuitBreakerRequestVolumeThreshold(20)
+                        //默认:50%。当出错率超过50%后熔断器启动.
                         .withCircuitBreakerErrorThresholdPercentage(50)
+                        //熔断器默认工作时间,默认:5秒.熔断器中断请求5秒后会进入半打开状态,放部分流量过去重试
                         .withCircuitBreakerSleepWindowInMilliseconds(5000))
                 .andThreadPoolPropertiesDefaults(HystrixThreadPoolProperties.Setter()
                         .withCoreSize(50)
@@ -55,7 +56,7 @@ public class RedisHystrixCommand extends HystrixCommand<Result> {
         String result = "";
         try {
             jedis = jedisPool.getResource();
-            result = jedis.get(this.queryKey);
+            result = jedis.get(dispatchRequest.getKey());
             if (result == null) {
                 return new Result(DataErrorCode.NO_CONTENT);
             }
@@ -72,10 +73,6 @@ public class RedisHystrixCommand extends HystrixCommand<Result> {
     protected Result getFallback() {
         LogUtil.logInfoRedisFallBack(dispatchRequest.getRequestParam() == null ? "" : dispatchRequest.getRequestParam().toJSONString());
         return new Result(DataErrorCode.FAIL);
-    }
-
-    public void setQueryKey(String queryKey) {
-        this.queryKey = queryKey;
     }
 
     public void setDispatchRequest(DispatchRequest dispatchRequest) {

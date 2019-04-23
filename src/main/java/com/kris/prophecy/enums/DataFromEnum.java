@@ -8,7 +8,9 @@ import com.baomidou.mybatisplus.core.enums.IEnum;
  * @author Kris
  * @date 2019/3/11
  */
+@SuppressWarnings("all")
 public enum DataFromEnum implements IEnum<Integer> {
+
     DATA_FROM_NO(0, "未从任何源查询数据"),
     DATA_FROM_REDIS(1, "数据来源于Redis缓存"),
     DATA_FROM_MONGO(2, "数据来源于Mongo缓存"),

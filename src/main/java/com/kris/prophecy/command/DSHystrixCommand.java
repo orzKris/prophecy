@@ -25,24 +25,20 @@ import java.io.IOException;
  * @author Kris
  * @date 2019/4/22
  */
-@Service
 @Scope("prototype")
 @Log4j2
 public class DSHystrixCommand extends HystrixCommand<Result> {
-
-    @Autowired
-    private CallMap callMap;
 
     private static final int HTTP_STATUS = 200;
 
     private DispatchRequest dispatchRequest;
 
-    protected DSHystrixCommand() {
+    public DSHystrixCommand(DispatchRequest dispatchRequest) {
         super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("DSHystrixCommand"))
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
                         .withMetricsRollingStatisticalWindowInMilliseconds(5000)
                         .withExecutionTimeoutInMilliseconds(1500)
-                        .withCircuitBreakerRequestVolumeThreshold(100)
+                        .withCircuitBreakerRequestVolumeThreshold(20)
                         .withCircuitBreakerErrorThresholdPercentage(50)
                         .withCircuitBreakerSleepWindowInMilliseconds(5000))
                 .andThreadPoolPropertiesDefaults(HystrixThreadPoolProperties.Setter()
@@ -52,6 +48,7 @@ public class DSHystrixCommand extends HystrixCommand<Result> {
                         .withMaxQueueSize(500)
                         .withQueueSizeRejectionThreshold(500)
                         .withKeepAliveTimeMinutes(5)));
+        this.dispatchRequest = dispatchRequest;
     }
 
     @Override
@@ -63,12 +60,15 @@ public class DSHystrixCommand extends HystrixCommand<Result> {
         try {
             Response response = call.execute();
             if (response.code() != HTTP_STATUS) {
-                return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.DATASOURCE_ERROR);
+                return new Result(DataErrorCode.DATASOURCE_ERROR);
             }
             responseBody = response.body().string();
-            Result result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, new JSONObject(), DataFromEnum.DATA_FROM_DATASOURCE);
+            Result result = new Result(DataErrorCode.SUCCESS, new JSONObject(), DataFromEnum.DATA_FROM_DATASOURCE);
             result.setContentNotParsed(responseBody);
             return result;
+        } catch (Exception e) {
+            log.error("Error to call datasource, callId: {}", dispatchRequest.getCallId(), e);
+            throw e;
         } finally {
             LogUtil.logInfo3rd(responseBody, start, dispatchRequest.getRequestParam() == null ? "" : dispatchRequest.getRequestParam().toJSONString());
         }
@@ -78,10 +78,6 @@ public class DSHystrixCommand extends HystrixCommand<Result> {
     protected Result getFallback() {
         LogUtil.logInfo3rdFallBack(dispatchRequest.getRequestParam() == null ? "" : dispatchRequest.getRequestParam().toJSONString());
         return new Result(DataErrorCode.FAIL);
-    }
-
-    public void setDispatchRequest(DispatchRequest dispatchRequest) {
-        this.dispatchRequest = dispatchRequest;
     }
 
 }

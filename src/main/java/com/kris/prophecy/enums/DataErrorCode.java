@@ -7,6 +7,7 @@ import com.kris.prophecy.model.common.exception.ErrorCode;
  * @author Kris
  * @date 2019/4/15
  */
+@SuppressWarnings("all")
 public enum DataErrorCode implements ErrorCode {
 
     SUCCESS("00", "成功"),

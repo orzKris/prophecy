@@ -94,7 +94,7 @@ public class MovieInformationCallable implements ConcurrentCallable {
         DispatchRequest dispatchRequest = DispatchRequest.builder()
                 .isEnable(isEnable)
                 .okHttpClient(new OkHttpClient())
-                .dsId(ServiceIdEnum.D004.getId())
+                .callId(ServiceIdEnum.D004.getId())
                 .requestParam(queryString)
                 .request(getRequest(queryString))
                 .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D004.getId()))

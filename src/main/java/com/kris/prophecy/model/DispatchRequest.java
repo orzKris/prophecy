@@ -29,9 +29,9 @@ public class DispatchRequest {
     private Request request;
 
     /**
-     * 数据源编号
+     * 接口编号
      */
-    private String dsId;
+    private String callId;
 
     /**
      * 调用数据源的请求参数

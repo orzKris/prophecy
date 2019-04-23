@@ -8,6 +8,7 @@ import java.util.Arrays;
  * @author Kris
  * @date 2019/3/1
  */
+@SuppressWarnings("all")
 public enum JuheErrorCodeEnum {
 
     E228000("网络超时"),

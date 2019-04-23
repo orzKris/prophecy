@@ -89,7 +89,7 @@ public class AddressResolutionCallable implements ConcurrentCallable {
                 .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D002.getId()))
                 .request(getRequest(queryString))
                 .requestParam(queryString)
-                .dsId(ServiceIdEnum.D002.getId())
+                .callId(ServiceIdEnum.D002.getId())
                 .okHttpClient(new OkHttpClient())
                 .isEnable(isEnable)
                 .build();

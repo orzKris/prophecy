@@ -4,7 +4,9 @@ package com.kris.prophecy.enums;
  * @author Kris
  * @date 2019/2/1
  */
+@SuppressWarnings("all")
 public enum ServiceIdEnum {
+
     D001("D001", "语言识别"),
     D002("D002", "经纬度地址解析"),
     D003("D003", "人脸检测"),

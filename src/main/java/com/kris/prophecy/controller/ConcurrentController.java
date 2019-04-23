@@ -87,7 +87,6 @@ public class ConcurrentController {
         try {
             result = future.get(20000, TimeUnit.MILLISECONDS);
             result.setName(serviceName);
-            LogUtil.logInfo(result.getJsonResult().toJSONString());
             return new Response<>(result.getStatus().getCode(), result.getStatus().getErrorMsg(), result.toJson());
 
         } catch (TimeoutException e) {

@@ -45,6 +45,12 @@ public class Result {
         this.status = status;
     }
 
+    public Result(DataErrorCode status, JSONObject jsonResult, DataFromEnum dataFrom) {
+        this.status = status;
+        this.jsonResult = jsonResult;
+        this.dataFrom = dataFrom;
+    }
+
     public Result(String name, DataErrorCode status, JSONObject jsonResult, DataFromEnum dataFrom) {
         this.name = name;
         this.status = status;

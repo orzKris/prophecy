@@ -24,10 +24,9 @@ public class LogUtil {
         log.error("[TRACE_ERROR]: request_time={},{},{},{} ", requestTime, conditionMessage, errorMessage, e);
     }
 
-    public static void logInfoElasticSearch(String uid, long start, String conditionMessage) {
+    public static void logInfoElasticSearch(long start, String conditionMessage) {
         long end = System.currentTimeMillis();
-        log.info("[TRACE_ES]: uid={},request_time={},response_time={},spend {} ms,{}",
-                uid, start, end, end - start, conditionMessage);
+        log.info("[TRACE_ES]: request_time={},spend {} ms,{}", start, end - start, conditionMessage);
     }
 
     public static void logInfo3rd(String responseBody, long start, String conditionMessage) {
@@ -50,9 +49,8 @@ public class LogUtil {
         log.info("[TRACE_REDIS_FALLBACK]:{}", conditionMessage);
     }
 
-    public static void logInfoMongo(String uid, String responseBody, long start, String conditionMessage) {
+    public static void logInfoMongo(String responseBody, long start, String conditionMessage) {
         long end = System.currentTimeMillis();
-        log.info("[TRACE_MONGO]: uid={},response_body={},request_time={},response_time={},spend {} ms,{}",
-                uid, responseBody, start, end, end - start, conditionMessage);
+        log.info("[TRACE_MONGO]: response_body={},request_time={},spend {} ms,{}", responseBody, start, end - start, conditionMessage);
     }
 }

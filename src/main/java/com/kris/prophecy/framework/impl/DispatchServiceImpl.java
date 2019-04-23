@@ -1,7 +1,9 @@
 package com.kris.prophecy.framework.impl;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.kris.prophecy.command.DSHystrixCommand;
+import com.kris.prophecy.command.RedisHystrixCommand;
+import com.kris.prophecy.config.ApplicationContextRegister;
 import com.kris.prophecy.enums.DataFromEnum;
 import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.framework.MongoService;
@@ -10,17 +12,14 @@ import com.kris.prophecy.model.Result;
 import com.kris.prophecy.model.CallMap;
 import com.kris.prophecy.model.DispatchRequest;
 import com.kris.prophecy.framework.DispatchService;
-import com.kris.prophecy.framework.RedisService;
-import com.kris.prophecy.utils.LogUtil;
 import lombok.extern.log4j.Log4j2;
-import okhttp3.Call;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 调度服务
@@ -31,71 +30,111 @@ import java.io.IOException;
 @Service
 @Scope("prototype")
 @Log4j2
+@SuppressWarnings("all")
 public class DispatchServiceImpl implements DispatchService {
 
     @Autowired
     private CallMap callMap;
 
     @Autowired
-    RedisService redisService;
+    private MongoService mongoService;
 
     @Autowired
-    MongoService mongoService;
+    private ApplicationContextRegister applicationContextRegister;
 
-    private static final int HTTP_STATUS = 200;
+    /**
+     * Redis最近一次重试时间
+     */
+    private long latestRetryTime = 0;
+
+    /**
+     * 存储熔断告警标示符
+     */
+    protected static final ConcurrentMap<String, Boolean> MAP = new ConcurrentHashMap<>();
+
+    private final static long hystrixSleepWindowIntervalTime = 5000;
 
     @Override
     public Result dispatch(DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
-        Result result = this.dispatchCache(dispatchRequest);
-        if (DataErrorCode.FAIL.getCode().equals(result.getStatus()) || result.getJsonResult() == null) {
-            result = this.dispatchDatasource(dispatchRequest, isParsed);
+        RedisHystrixCommand redisHystrixCommand = getRedisHystrixCommand();
+        redisHystrixCommand.setDispatchRequest(dispatchRequest);
+        if (redisHystrixCommand.isCircuitBreakerOpen()) {
+            openRedisCircuitBreakerLog();
+            if (System.currentTimeMillis() - latestRetryTime >= hystrixSleepWindowIntervalTime) {
+                return retryRedisCommand(redisHystrixCommand, dispatchRequest, isParsed);
+            }
+            return dispatchDatasource(dispatchRequest, isParsed);
+        } else {
+            closeRedisCircuitBreakerLog();
+            Result result = redisHystrixCommand.execute();
+            if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
+                return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
+            } else {
+                //调用数据源
+                return dispatchDatasource(dispatchRequest, isParsed);
+            }
         }
-        return result;
     }
 
     @Override
-    public Result dispatchDatasource(DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
+    public Result dispatchDatasource(DispatchRequest dispatchRequest, boolean isParsed) {
         if (!dispatchRequest.isEnable()) {
             return new Result(DataErrorCode.INTERFACE_FORBIDDEN);
         }
-        String responseBody = "";
         long start = System.currentTimeMillis();
-        Result result;
+        Result result = new Result();
+        DSHystrixCommand dsHystrixCommand = new DSHystrixCommand(dispatchRequest);
         try {
-            Request request = dispatchRequest.getRequest();
-            Call call = dispatchRequest.getOkHttpClient().newCall(request);
-            Response response = call.execute();
-            if (response.code() != HTTP_STATUS) {
-                return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.DATASOURCE_ERROR);
-            }
-            responseBody = response.body().string();
+            result = dsHystrixCommand.execute();
             if (isParsed) {
-                JSONObject jsonResult = JSONObject.parseObject(responseBody);
-                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_DATASOURCE);
+                JSONObject jsonResult = JSONObject.parseObject(result.getContentNotParsed());
+                result.setName(callMap.getMap().get(dispatchRequest.getCallId()));
+                result.setJsonResult(jsonResult);
             } else {
-                result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, new JSONObject(), DataFromEnum.DATA_FROM_DATASOURCE);
-                result.setContentNotParsed(responseBody);
+                result.setName(callMap.getMap().get(dispatchRequest.getCallId()));
             }
             return result;
         } finally {
-            LogUtil.logInfo3rd(responseBody, start, dispatchRequest.getRequestParam().toJSONString());
-            mongoService.asyncInsert(new DataCenter(dispatchRequest.getKey(), responseBody));
+            mongoService.asyncInsert(new DataCenter(dispatchRequest.getKey(), result.getContentNotParsed()));
         }
     }
 
-    @Override
-    public Result dispatchCache(DispatchRequest dispatchRequest) {
-        String responseBody = "";
-        long start = System.currentTimeMillis();
-        JSONObject jsonResult = new JSONObject();
-        try {
-            jsonResult = JSON.parseObject(redisService.get(dispatchRequest.getKey()));
-            Result result = new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.SUCCESS, jsonResult, DataFromEnum.DATA_FROM_REDIS);
-            return result;
-        } catch (Exception e) {
-            return new Result(callMap.getMap().get(dispatchRequest.getDsId()), DataErrorCode.FAIL, jsonResult, DataFromEnum.DATA_FROM_REDIS);
-        } finally {
-            LogUtil.logInfoRedis(responseBody, start, dispatchRequest.getRequestParam().toJSONString());
+    private RedisHystrixCommand getRedisHystrixCommand() {
+        return (RedisHystrixCommand) applicationContextRegister.getApplicationContext().getBean("redisHystrixCommand");
+    }
+
+    /**
+     * Redis熔断告警日志，只在断路器开启时打印一次
+     */
+    private void openRedisCircuitBreakerLog() {
+        Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
+        if (circuitBreakerOpenFlag == null || !circuitBreakerOpenFlag) {
+            log.info("Redis CircuitBreaker opened");
+            MAP.put("redisHystrixCommand", true);
+            latestRetryTime = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * 关闭Redis熔断告警日志，只在断路器关闭时打印一次
+     */
+    private void closeRedisCircuitBreakerLog() {
+        Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
+        if (circuitBreakerOpenFlag != null && circuitBreakerOpenFlag) {
+            log.info("Redis CircuitBreaker close");
+            MAP.put("redisHystrixCommand", false);
+        }
+    }
+
+    private Result retryRedisCommand(RedisHystrixCommand redisHystrixCommand, DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
+        //熔断后，需要触发熔断器去重试
+        Result result = redisHystrixCommand.execute();
+        latestRetryTime = System.currentTimeMillis();
+        if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
+            return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
+        } else {
+            //调用数据源
+            return dispatchDatasource(dispatchRequest, isParsed);
         }
     }
 }

@@ -69,12 +69,12 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
         try {
             if (paramJson.containsKey(DataDevelopmentConstant.INTERFACE_ID)) {
                 Page<DataCenter> data = mongoService.findByIdLike(interfaceId, page, pageSize);
-                LogUtil.logInfoMongo(paramJson.getString(RequestConstant.UID), JSON.toJSONString(data.getContent()), start, conditionMessage);
+                LogUtil.logInfoMongo(JSON.toJSONString(data.getContent()), start, conditionMessage);
                 jsonArray = JSONArray.parseArray(JSON.toJSONString(data.getContent()));
                 jsonResult.put(DataDevelopmentConstant.COUNT, mongoService.countByIdLike(interfaceId));
             } else {
                 Page<DataCenter> data = mongoService.findAll(page, pageSize);
-                LogUtil.logInfoMongo(paramJson.getString(RequestConstant.UID), JSON.toJSONString(data.getContent()), start, conditionMessage);
+                LogUtil.logInfoMongo(JSON.toJSONString(data.getContent()), start, conditionMessage);
                 jsonArray = JSONArray.parseArray(JSON.toJSONString(data.getContent()));
                 jsonResult.put(DataDevelopmentConstant.COUNT, mongoService.count());
             }

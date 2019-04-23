@@ -86,7 +86,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
                 .key(KeyUtil.structureKeyString(base64data, ServiceIdEnum.D003.getId()))
                 .request(getRequest(queryString, base64data))
                 .requestParam(queryString)
-                .dsId(ServiceIdEnum.D003.getId())
+                .callId(ServiceIdEnum.D003.getId())
                 .okHttpClient(new OkHttpClient())
                 .isEnable(isEnable)
                 .build();
