@@ -31,7 +31,7 @@ public class RemoteHystrixCommand extends HystrixCommand<Result> {
     private DispatchRequest dispatchRequest;
 
     public RemoteHystrixCommand(DispatchRequest dispatchRequest) {
-        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("RemoteHystrixCommand"))
+        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("remoteHystrixCommand"))
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
                         .withMetricsRollingStatisticalWindowInMilliseconds(5000)
                         .withExecutionTimeoutInMilliseconds(1500)
