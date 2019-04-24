@@ -43,36 +43,29 @@ public class DispatchServiceImpl implements DispatchService {
     private ApplicationContextRegister applicationContextRegister;
 
     /**
-     * Redis最近一次重试时间
-     */
-    private long latestRetryTime = 0;
-
-    /**
      * 存储熔断告警标示符
      */
-    protected static final ConcurrentMap<String, Boolean> MAP = new ConcurrentHashMap<>();
+    protected static final ConcurrentMap<String, Boolean> map = new ConcurrentHashMap<>();
 
-    private final static long hystrixSleepWindowIntervalTime = 5000;
-
+    /**
+     * 熔断恢复由Hystrix内部实现，无需手动重试
+     */
     @Override
     public Result dispatch(DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
         RedisHystrixCommand redisHystrixCommand = getRedisHystrixCommand();
         redisHystrixCommand.setDispatchRequest(dispatchRequest);
         if (redisHystrixCommand.isCircuitBreakerOpen()) {
+            //触发告警
             redisCircuitBreakerOpenLog();
-            if (System.currentTimeMillis() - latestRetryTime >= hystrixSleepWindowIntervalTime) {
-                return retryRedisCommand(redisHystrixCommand, dispatchRequest, isParsed);
-            }
-            return dispatchDatasource(dispatchRequest, isParsed);
         } else {
             redisCircuitBreakerCloseLog();
-            Result result = redisHystrixCommand.execute();
-            if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
-                return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
-            } else {
-                //调用数据源
-                return dispatchDatasource(dispatchRequest, isParsed);
-            }
+        }
+        Result result = redisHystrixCommand.execute();
+        if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
+            return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
+        } else {
+            //调用数据源
+            return dispatchDatasource(dispatchRequest, isParsed);
         }
     }
 
@@ -107,11 +100,10 @@ public class DispatchServiceImpl implements DispatchService {
      * Redis熔断告警日志，只在断路器开启时打印一次
      */
     private void redisCircuitBreakerOpenLog() {
-        Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
+        Boolean circuitBreakerOpenFlag = map.get("redisHystrixCommand");
         if (circuitBreakerOpenFlag == null || !circuitBreakerOpenFlag) {
-            log.info("Redis CircuitBreaker opened");
-            MAP.put("redisHystrixCommand", true);
-            latestRetryTime = System.currentTimeMillis();
+            log.info("Redis CircuitBreaker open");
+            map.put("redisHystrixCommand", true);
         }
     }
 
@@ -119,22 +111,11 @@ public class DispatchServiceImpl implements DispatchService {
      * Redis熔断关闭告警日志，只在断路器关闭时打印一次
      */
     private void redisCircuitBreakerCloseLog() {
-        Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
+        Boolean circuitBreakerOpenFlag = map.get("redisHystrixCommand");
         if (circuitBreakerOpenFlag != null && circuitBreakerOpenFlag) {
             log.info("Redis CircuitBreaker close");
-            MAP.put("redisHystrixCommand", false);
+            map.put("redisHystrixCommand", false);
         }
     }
 
-    private Result retryRedisCommand(RedisHystrixCommand redisHystrixCommand, DispatchRequest dispatchRequest, boolean isParsed) throws IOException {
-        //熔断后，需要触发熔断器去重试
-        Result result = redisHystrixCommand.execute();
-        latestRetryTime = System.currentTimeMillis();
-        if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
-            return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
-        } else {
-            //调用数据源
-            return dispatchDatasource(dispatchRequest, isParsed);
-        }
-    }
 }
