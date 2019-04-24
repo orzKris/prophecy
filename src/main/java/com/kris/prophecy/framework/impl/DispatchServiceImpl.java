@@ -1,7 +1,7 @@
 package com.kris.prophecy.framework.impl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.command.DSHystrixCommand;
+import com.kris.prophecy.command.RemoteHystrixCommand;
 import com.kris.prophecy.command.RedisHystrixCommand;
 import com.kris.prophecy.config.ApplicationContextRegister;
 import com.kris.prophecy.enums.DataFromEnum;
@@ -59,13 +59,13 @@ public class DispatchServiceImpl implements DispatchService {
         RedisHystrixCommand redisHystrixCommand = getRedisHystrixCommand();
         redisHystrixCommand.setDispatchRequest(dispatchRequest);
         if (redisHystrixCommand.isCircuitBreakerOpen()) {
-            openRedisCircuitBreakerLog();
+            redisCircuitBreakerOpenLog();
             if (System.currentTimeMillis() - latestRetryTime >= hystrixSleepWindowIntervalTime) {
                 return retryRedisCommand(redisHystrixCommand, dispatchRequest, isParsed);
             }
             return dispatchDatasource(dispatchRequest, isParsed);
         } else {
-            closeRedisCircuitBreakerLog();
+            redisCircuitBreakerCloseLog();
             Result result = redisHystrixCommand.execute();
             if (DataErrorCode.SUCCESS.equals(result.getStatus())) {
                 return new Result(callMap.getMap().get(dispatchRequest.getCallId()), result.getStatus(), JSONObject.parseObject(result.getContentNotParsed()), DataFromEnum.DATA_FROM_REDIS);
@@ -83,9 +83,9 @@ public class DispatchServiceImpl implements DispatchService {
         }
         long start = System.currentTimeMillis();
         Result result = new Result();
-        DSHystrixCommand dsHystrixCommand = new DSHystrixCommand(dispatchRequest);
+        RemoteHystrixCommand remoteHystrixCommand = new RemoteHystrixCommand(dispatchRequest);
         try {
-            result = dsHystrixCommand.execute();
+            result = remoteHystrixCommand.execute();
             if (isParsed) {
                 JSONObject jsonResult = JSONObject.parseObject(result.getContentNotParsed());
                 result.setName(callMap.getMap().get(dispatchRequest.getCallId()));
@@ -106,7 +106,7 @@ public class DispatchServiceImpl implements DispatchService {
     /**
      * Redis熔断告警日志，只在断路器开启时打印一次
      */
-    private void openRedisCircuitBreakerLog() {
+    private void redisCircuitBreakerOpenLog() {
         Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
         if (circuitBreakerOpenFlag == null || !circuitBreakerOpenFlag) {
             log.info("Redis CircuitBreaker opened");
@@ -116,9 +116,9 @@ public class DispatchServiceImpl implements DispatchService {
     }
 
     /**
-     * 关闭Redis熔断告警日志，只在断路器关闭时打印一次
+     * Redis熔断关闭告警日志，只在断路器关闭时打印一次
      */
-    private void closeRedisCircuitBreakerLog() {
+    private void redisCircuitBreakerCloseLog() {
         Boolean circuitBreakerOpenFlag = MAP.get("redisHystrixCommand");
         if (circuitBreakerOpenFlag != null && circuitBreakerOpenFlag) {
             log.info("Redis CircuitBreaker close");
