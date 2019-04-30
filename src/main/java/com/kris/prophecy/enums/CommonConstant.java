@@ -4,7 +4,7 @@ package com.kris.prophecy.enums;
  * @author Kris
  * @date 2019/1/31
  */
-public class RequestConstant {
+public class CommonConstant {
 
     public static final String PARAM = "param";
 
@@ -19,5 +19,11 @@ public class RequestConstant {
     public static final String FILE_UPLOAD = "file_upload";
 
     public static final String FILE = "file";
+
+    public static final String REDIS_COMMAND_GROUP = "redisHystrixGroup";
+
+    public static final String REMOTE_COMMAND_GROUP = "remoteHystrixGroup";
+
+    public static final String COMMAND_KEY_PREFIX = "commandKey_";
 
 }

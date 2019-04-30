@@ -55,12 +55,12 @@ public class LanguageDetectCallable implements ConcurrentCallable {
 
     @Override
     public Result call() {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String text = paramJson.getString(LanguageDetectConstant.TEXT);
         Map<String, String> map = new HashMap<>(1);
         map.put(LanguageDetectConstant.QUERY, text);
-        String uid = paramJson.getString(RequestConstant.UID);
+        String uid = paramJson.getString(CommonConstant.UID);
         long start = System.currentTimeMillis();
 
         Result result = new Result(DataErrorCode.SUCCESS);
@@ -76,7 +76,7 @@ public class LanguageDetectCallable implements ConcurrentCallable {
             LogUtil.logError(requestTime, text, "请求百度语言识别接口失败", e);
             return new Result(DataErrorCode.FAIL);
         } finally {
-            paramJson.remove(RequestConstant.UID);
+            paramJson.remove(CommonConstant.UID);
             String id = KeyUtil.structureKey(paramJson, ServiceIdEnum.D001.getId());
             mongoService.asyncInsert(new DataCenter(id, result.getJsonResult().toJSONString()));
         }

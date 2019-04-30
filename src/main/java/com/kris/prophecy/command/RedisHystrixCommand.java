@@ -1,5 +1,6 @@
 package com.kris.prophecy.command;
 
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.model.DispatchRequest;
 import com.kris.prophecy.model.Result;
@@ -30,7 +31,7 @@ public class RedisHystrixCommand extends HystrixCommand<Result> {
     private DispatchRequest dispatchRequest;
 
     public RedisHystrixCommand() {
-        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey("redisHystrixCommand"))
+        super(Setter.withGroupKey(HystrixCommandGroupKey.Factory.asKey(CommonConstant.REDIS_COMMAND_GROUP))
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
                         .withMetricsRollingStatisticalWindowInMilliseconds(5000)
                         .withExecutionTimeoutInMilliseconds(1500)

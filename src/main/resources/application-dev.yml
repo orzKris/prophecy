@@ -64,6 +64,7 @@ language:
 address:
   url: http://apis.juhe.cn/geo
   key: 2bc57d818e18d1cbe33748124b12dd10
+  timeOut: 5000
   isEnable: true
 # 旷视人脸检测
 face:
@@ -71,15 +72,18 @@ face:
   apiKey: fPd1ep8kXcdKvcAXUPswDpTGxwkPNb3O
   apiSecret: Ris2AFcKzjmqgUXXbi99bmPio0_lamBS
   returnAttributes: gender,skinstatus,beauty,age,emotion
+  timeOut: 5000
   isEnable: true
 # 影讯集合
 movie:
   url: http://v.juhe.cn/movie/index
   key: 0d8f7a7d1cfb1c3e1275ec931b154fa2
+  timeOut: 5000
   isEnable: true
 # 手机归属地
 mobile:
   url: http://tcc.taobao.com/cc/json/mobile_tel_segment.htm
+  timeOut: 5000
   isEnable: true
 
 

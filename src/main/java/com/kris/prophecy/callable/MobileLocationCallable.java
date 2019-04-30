@@ -41,6 +41,8 @@ public class MobileLocationCallable implements ConcurrentCallable {
 
     private boolean isEnable = true;
 
+    private int timeOut = 5000;
+
     @Autowired
     DispatchService dispatchService;
 
@@ -62,7 +64,7 @@ public class MobileLocationCallable implements ConcurrentCallable {
 
     @Override
     public Result call() {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String mobile = paramJson.getString(MobileLocationConstant.MOBILE);
         String conditionMessage = String.format("mobile=%s", mobile);
@@ -80,6 +82,7 @@ public class MobileLocationCallable implements ConcurrentCallable {
         JSONObject keyString = new JSONObject();
         keyString.put(MobileLocationConstant.MOBILE, mobile);
         DispatchRequest dispatchRequest = DispatchRequest.builder()
+                .timeOut(timeOut)
                 .isEnable(isEnable)
                 .okHttpClient(new OkHttpClient())
                 .callId(ServiceIdEnum.D005.getId())

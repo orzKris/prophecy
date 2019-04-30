@@ -48,4 +48,9 @@ public class DispatchRequest {
      */
     private String key;
 
+    /**
+     * 接口超时时间
+     */
+    private int timeOut;
+
 }

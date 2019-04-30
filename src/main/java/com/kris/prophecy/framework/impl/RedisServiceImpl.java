@@ -1,9 +1,10 @@
 package com.kris.prophecy.framework.impl;
 
 import com.kris.prophecy.framework.RedisService;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
@@ -60,7 +61,9 @@ public class RedisServiceImpl implements RedisService {
      * key 存在 则更新
      */
     @Override
-    @Async
+    @HystrixCommand(fallbackMethod = "hystrixSet", threadPoolProperties = {@HystrixProperty(name = "coreSize", value = "50"),
+            @HystrixProperty(name = "maximumSize", value = "200"), @HystrixProperty(name = "maxQueueSize", value = "100"),
+            @HystrixProperty(name = "queueSizeRejectionThreshold", value = "100"), @HystrixProperty(name = "allowMaximumSizeToDivergeFromCoreSize", value = "true")})
     public void asyncSet(String key, String value, int seconds) {
         Jedis jedis = null;
         try {
@@ -69,11 +72,13 @@ public class RedisServiceImpl implements RedisService {
             jedis.set(key, value);
             jedis.expire(key, seconds);
             log.info("Success to asyncInsert redis, key: {}, value: {}, seconds: {}", key, value, seconds);
-        } catch (Exception e) {
-            log.info("redis asyncSet value error");
         } finally {
             returnResource(jedis);
         }
+    }
+
+    private void hystrixSet(String key, String value, int seconds) {
+        log.error("[INSERT_FALLBACK]: key: {}, value: {}, seconds: {}", key, value, seconds);
     }
 
     /**

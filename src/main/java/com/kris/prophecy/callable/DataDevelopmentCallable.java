@@ -55,7 +55,7 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
 
     @Override
     public Result call() {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String interfaceId = paramJson.getString(DataDevelopmentConstant.INTERFACE_ID);
         Integer page = paramJson.getInteger(DataDevelopmentConstant.PAGE_NUM) == null ? 0 : paramJson.getInteger(DataDevelopmentConstant.PAGE_NUM);

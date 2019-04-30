@@ -3,7 +3,7 @@ package com.kris.prophecy.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.config.ApplicationContextRegister;
 import com.kris.prophecy.enums.DataErrorCode;
-import com.kris.prophecy.enums.RequestConstant;
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.model.Result;
 import com.kris.prophecy.model.CallMap;
 import com.kris.prophecy.framework.ConcurrentCallable;
@@ -53,25 +53,25 @@ public class ConcurrentController {
     @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public Response main(HttpServletRequest request, @PathVariable("id") String id) {
         long start = System.currentTimeMillis();
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        String param = request.getParameter(RequestConstant.PARAM);
-        String uid = request.getHeader(RequestConstant.UID);
+        String param = request.getParameter(CommonConstant.PARAM);
+        String uid = request.getHeader(CommonConstant.UID);
 
         Response paramResult = checkParam(param, requestTime);
         if (!paramResult.getResponseCode().equals(DataErrorCode.SUCCESS.getCode())) {
             return paramResult;
         }
         JSONObject paramJson = (JSONObject) paramResult.getResult();
-        if (paramJson.containsKey(RequestConstant.FILE_UPLOAD)) {
+        if (paramJson.containsKey(CommonConstant.FILE_UPLOAD)) {
             InputStream inputStream = obtainFile(request, requestTime);
-            paramJson.put(RequestConstant.FILE, inputStream);
+            paramJson.put(CommonConstant.FILE, inputStream);
         }
         String serviceName = callMap.getMap().get(id);
         if (serviceName == null) {
             return Response.error(DataErrorCode.NO_CONFIGURED_SERVICE);
         }
-        paramJson.put(RequestConstant.UID, uid);
+        paramJson.put(CommonConstant.UID, uid);
         LogUtil.logInfo("调用的服务有：" + serviceName);
         //执行配置的服务
         CompletionService<Result> executorCompletionService = new ExecutorCompletionService<>(SCHEDULED_EXECUTOR_SERVICE);
@@ -107,7 +107,7 @@ public class ConcurrentController {
         try {
             return Response.ok(JSONObject.parseObject(param));
         } catch (Exception e) {
-            LogUtil.logError(requestTime, param, RequestConstant.PARAM_MUST_BE_JSON, e);
+            LogUtil.logError(requestTime, param, CommonConstant.PARAM_MUST_BE_JSON, e);
             return Response.error(DataErrorCode.PARAM_ERROR);
         }
     }
@@ -121,7 +121,7 @@ public class ConcurrentController {
                 inputStream = multipartFile.getInputStream();
             }
         } catch (Exception e) {
-            LogUtil.logError(requestTime, request.toString(), RequestConstant.FILE_UPLOAD_FAIL, e);
+            LogUtil.logError(requestTime, request.toString(), CommonConstant.FILE_UPLOAD_FAIL, e);
         }
         return inputStream;
     }

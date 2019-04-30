@@ -3,7 +3,7 @@ package com.kris.prophecy.reflect.impl;
 import com.kris.prophecy.enums.DataErrorCode;
 import com.kris.prophecy.reflect.annotation.InvokeListener;
 import com.kris.prophecy.reflect.annotation.ServiceDataMapping;
-import com.kris.prophecy.enums.RequestConstant;
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.entity.InterfaceUsage;
 import com.kris.prophecy.mapper.InterfaceUsageMapper;
 import com.kris.prophecy.mapper.UserMapper;
@@ -60,9 +60,9 @@ public class InvokeServiceImpl implements InvokeService, ApplicationContextAware
     @Override
     public Object serviceInvoke(HttpServletRequest request, String tag, String rid, Object... args) throws Throwable {
         long start = System.currentTimeMillis();
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        String uid = request.getHeader(RequestConstant.UID);
+        String uid = request.getHeader(CommonConstant.UID);
         String conditionMessage = String.format("tag=%s,rid=%s", tag, rid);
         InterfaceUsage interfaceUsage = new InterfaceUsage();
         interfaceUsage.setUid(uid);

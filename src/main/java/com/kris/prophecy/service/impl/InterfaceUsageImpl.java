@@ -5,6 +5,7 @@ import com.kris.prophecy.mapper.InterfaceUsageMapper;
 import com.kris.prophecy.service.InterfaceUsageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 
 /**
@@ -17,7 +18,11 @@ public class InterfaceUsageImpl implements InterfaceUsageService {
     @Autowired
     InterfaceUsageMapper interfaceUsageMapper;
 
+    /**
+     * 如果方法加了@Transactional注解，那么这个方法抛出异常，就会回滚，数据库里面的数据也会回滚。
+     */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void insertInterfaceUsage(long start, String uri, String args, String uid, String status) {
         InterfaceUsage interfaceUsage = new InterfaceUsage();
         interfaceUsage.setResponseTime(System.currentTimeMillis() - start);

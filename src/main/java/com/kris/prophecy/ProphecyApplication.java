@@ -7,6 +7,7 @@ import com.kris.prophecy.filter.FrequencyFilter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author by Kris on 8/26/2018.
  */
 @EnableAsync
+@EnableCircuitBreaker
 @SpringBootApplication
 public class ProphecyApplication {
 

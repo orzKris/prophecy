@@ -47,6 +47,8 @@ public class FaceDetectionCallable implements ConcurrentCallable {
 
     private boolean isEnable = true;
 
+    private int timeOut = 5000;
+
     @Autowired
     DispatchService dispatchService;
 
@@ -57,7 +59,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
 
     @Override
     public Result checkParam(JSONObject paramJson) {
-        if (!paramJson.containsKey(RequestConstant.FILE)) {
+        if (!paramJson.containsKey(CommonConstant.FILE)) {
             return Result.fail("parameter file not present !");
         }
         return Result.success();
@@ -65,9 +67,9 @@ public class FaceDetectionCallable implements ConcurrentCallable {
 
     @Override
     public Result call() throws IOException {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        InputStream inputStream = (InputStream) paramJson.get(RequestConstant.FILE);
+        InputStream inputStream = (InputStream) paramJson.get(CommonConstant.FILE);
         String base64data = fileToBase64(inputStream, requestTime);
         try {
             return getData(base64data);
@@ -88,6 +90,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
                 .requestParam(queryString)
                 .callId(ServiceIdEnum.D003.getId())
                 .okHttpClient(new OkHttpClient())
+                .timeOut(timeOut)
                 .isEnable(isEnable)
                 .build();
         Result result = dispatchService.dispatchDatasource(dispatchRequest, true);

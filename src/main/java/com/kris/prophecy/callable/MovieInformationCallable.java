@@ -45,6 +45,8 @@ public class MovieInformationCallable implements ConcurrentCallable {
 
     private boolean isEnable = true;
 
+    private int timeOut = 5000;
+
     @Autowired
     DispatchService dispatchService;
 
@@ -66,7 +68,7 @@ public class MovieInformationCallable implements ConcurrentCallable {
 
     @Override
     public Result call() throws UnsupportedEncodingException {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String title = URLEncoder.encode(paramJson.getString(MovieInformationConstant.TITLE), "UTF-8");
         Integer searchFlag = paramJson.getInteger(MovieInformationConstant.SEARCH_FLAG) == null ? 1
@@ -92,6 +94,7 @@ public class MovieInformationCallable implements ConcurrentCallable {
         keyString.put(MovieInformationConstant.TITLE, title);
         keyString.put(MovieInformationConstant.SMODE, searchFlag);
         DispatchRequest dispatchRequest = DispatchRequest.builder()
+                .timeOut(timeOut)
                 .isEnable(isEnable)
                 .okHttpClient(new OkHttpClient())
                 .callId(ServiceIdEnum.D004.getId())

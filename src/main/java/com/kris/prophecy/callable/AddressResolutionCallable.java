@@ -43,6 +43,8 @@ public class AddressResolutionCallable implements ConcurrentCallable {
 
     private boolean isEnable = true;
 
+    private int timeOut = 5000;
+
     @Autowired
     DispatchService dispatchService;
 
@@ -64,7 +66,7 @@ public class AddressResolutionCallable implements ConcurrentCallable {
 
     @Override
     public Result call() {
-        DateFormat df = new SimpleDateFormat(RequestConstant.DATE_FORMAT_DEFAULT);
+        DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
         String longitude = paramJson.getString(AddressResolutionConstant.LONGITUDE);
         String latitude = paramJson.getString(AddressResolutionConstant.LATITUDE);
@@ -91,6 +93,7 @@ public class AddressResolutionCallable implements ConcurrentCallable {
                 .requestParam(queryString)
                 .callId(ServiceIdEnum.D002.getId())
                 .okHttpClient(new OkHttpClient())
+                .timeOut(timeOut)
                 .isEnable(isEnable)
                 .build();
         Result result = dispatchService.dispatchDatasource(dispatchRequest, true);
