@@ -1,5 +1,6 @@
 package com.kris.prophecy.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.enums.ServiceCode;
 import com.kris.prophecy.entity.User;
 import com.kris.prophecy.model.common.util.Response;
@@ -28,7 +29,7 @@ public class DataReflectController {
     public Response userReflect(HttpServletRequest request, @RequestHeader("uid") String uid, @RequestParam("frequency") long frequency) throws Throwable {
         String rid = UUID.randomUUID().toString().replace("-", "");
         Object result = invokeService.serviceInvoke(request, ServiceCode.ADD_USER_REFLECT, rid, frequency);
-        List<User> userList = (List<User>) result;
+        List<JSONObject> userList = (List<JSONObject>) result;
         return Response.ok(userList);
     }
 

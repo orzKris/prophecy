@@ -1,16 +1,17 @@
 package com.kris.prophecy.service.impl;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.mapper.UserMapper;
 import com.kris.prophecy.service.UserReflectService;
 import com.kris.prophecy.utils.GetUserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -26,7 +27,8 @@ public class UserReflectServiceImpl implements UserReflectService {
      * 随机添加用户
      */
     @Override
-    public List<User> addUser(long frequency) {
+    public List<JSONObject> addUser(long frequency) {
+        List<JSONObject> userJson = new ArrayList<>();
         List<User> users = new ArrayList<>();
         for (int i = 0; i < frequency; i++) {
             User user = new User();
@@ -44,6 +46,9 @@ public class UserReflectServiceImpl implements UserReflectService {
             user.setGraduationTime((int) (Math.random() * 8 + 2010));
             user.setPassword(GetUserUtil.genRandomNum());
             user.setSchool(GetUserUtil.GRADUATION_SCHOOL);
+            DateFormat dateFormat = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
+            String registerTime = dateFormat.format(new Date());
+            user.setRegisterTime(registerTime);
             String sex = null;
             random = new Random();
             if (random.nextBoolean()) {
@@ -56,8 +61,9 @@ public class UserReflectServiceImpl implements UserReflectService {
             String subordinateClass = GetUserUtil.SUBORDINATE_CLASS[index];
             user.setSubordinateClass(subordinateClass);
             users.add(user);
+            userJson.add(user.toJson());
         }
         userMapper.insertUserList(users);
-        return users;
+        return userJson;
     }
 }

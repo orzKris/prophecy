@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: release
 server:
   port: 8888
 

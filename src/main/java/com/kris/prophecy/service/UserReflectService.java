@@ -1,5 +1,6 @@
 package com.kris.prophecy.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
 
 import java.util.List;
@@ -12,5 +13,5 @@ public interface UserReflectService {
     /**
      * 用户填充服务
      */
-    List<User> addUser(long frequency);
+    List<JSONObject> addUser(long frequency);
 }
