@@ -133,4 +133,7 @@ ALTER TABLE message MODIFY uid varchar(511) NOT NULL COMMENT '目标用户ID，0
 ALTER TABLE message MODIFY publisher_uid varchar(511) COMMENT '发布人用户ID';
 ALTER TABLE message_status MODIFY uid varchar(511) NOT NULL COMMENT '用户ID';
 ALTER TABLE message MODIFY type varchar(15) DEFAULT null  COMMENT '消息类型：sys-系统通知，report-报告通知';
+ALTER TABLE user MODIFY register_time varchar(20) NOT NULL COMMENT '注册时间';
+ALTER TABLE post MODIFY create_time varchar(20) COMMENT '发帖时间';
+ALTER TABLE post_reply MODIFY reply_time varchar(20) COMMENT '回复时间';
 

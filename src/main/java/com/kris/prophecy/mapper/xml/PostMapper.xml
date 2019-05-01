@@ -160,8 +160,8 @@
             <if test="rid != null">
                 rid,
             </if>
-            <if test="replyUid != null">
-                uid,
+            <if test="replyTime != null">
+                reply_time,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -174,8 +174,8 @@
             <if test="rid != null">
                 #{rid,jdbcType=VARCHAR},
             </if>
-            <if test="replyUid != null">
-                #{replyUid,jdbcType=VARCHAR},
+            <if test="replyTime != null">
+                #{replyTime,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>

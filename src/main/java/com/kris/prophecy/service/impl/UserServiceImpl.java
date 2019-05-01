@@ -2,6 +2,7 @@ package com.kris.prophecy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.UserMapper;
 import com.kris.prophecy.model.common.util.Response;
@@ -10,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,6 +34,8 @@ public class UserServiceImpl implements UserService {
         if (userMapper.selectByName(user.getName()) != null) {
             return Response.error(UserErrorCode.USER_ALREADY_EXIST);
         }
+        DateFormat dateFormat = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
+        user.setRegisterTime(dateFormat.format(new Date()));
         String uid = UUID.nameUUIDFromBytes(user.getName().getBytes()).toString();
         user.setUid(uid);
         int ret = userMapper.insertSelective(user);

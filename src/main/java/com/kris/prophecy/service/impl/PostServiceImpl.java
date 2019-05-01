@@ -3,6 +3,7 @@ package com.kris.prophecy.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Post;
 import com.kris.prophecy.entity.User;
+import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.PostMapper;
 import com.kris.prophecy.mapper.UserMapper;
@@ -13,7 +14,10 @@ import com.kris.prophecy.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -39,6 +43,8 @@ public class PostServiceImpl implements PostService {
      */
     @Override
     public Response post(Post post) {
+        DateFormat dateFormat = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
+        post.setCreateTime(dateFormat.format(new Date()));
         int ret = postMapper.insertSelective(post);
         if (ret > 0) {
             return Response.message("发帖成功");
@@ -58,6 +64,8 @@ public class PostServiceImpl implements PostService {
         if (post.getRid() != null && !postMapper.selectByRid(post.getRid()).equals(post.getId())) {
             return Response.error(UserErrorCode.POST_NOT_MATCH);
         }
+        DateFormat dateFormat = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
+        post.setReplyTime(dateFormat.format(new Date()));
         int ret = postMapper.insertReply(post);
         if (ret > 0) {
             return Response.message("回复成功");

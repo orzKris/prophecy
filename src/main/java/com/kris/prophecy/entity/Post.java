@@ -1,6 +1,8 @@
 package com.kris.prophecy.entity;
 
+import lombok.Data;
 
+@Data
 public class Post {
 
     /**
@@ -51,107 +53,4 @@ public class Post {
      */
     private Integer rid;
 
-    public Integer getRid() {
-        return rid;
-    }
-
-    public void setRid(Integer rid) {
-        this.rid = rid;
-    }
-
-    public String getReplyName() {
-        return replyName;
-    }
-
-    public void setReplyName(String replyName) {
-        this.replyName = replyName;
-    }
-
-    public String getRespondentName() {
-        return respondentName;
-    }
-
-    public void setRespondentName(String respondentName) {
-        this.respondentName = respondentName;
-    }
-
-    public String getReplyUid() {
-        return replyUid;
-    }
-
-    public void setReplyUid(String replyUid) {
-        this.replyUid = replyUid;
-    }
-
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    public String getReplyContent() {
-        return replyContent;
-    }
-
-    public void setReplyContent(String replyContent) {
-        this.replyContent = replyContent;
-    }
-
-    public String getReplyTime() {
-        try {
-            return replyTime.split("\\.")[0];
-        }catch (Exception e){
-            return replyTime;
-        }
-    }
-
-    public void setReplyTime(String replyTime) {
-        this.replyTime = replyTime;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title == null ? null : title.trim();
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content == null ? null : content.trim();
-    }
-
-    public String getCreateTime() {
-        try {
-            return createTime.split("\\.")[0];
-        } catch (Exception e) {
-            return createTime;
-        }
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public Integer getLikes() {
-        return likes;
-    }
-
-    public void setLikes(Integer likes) {
-        this.likes = likes;
-    }
 }
