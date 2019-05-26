@@ -1,4 +1,4 @@
-package com.kris.prophecy;
+package com.kris.prophecy.script;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;

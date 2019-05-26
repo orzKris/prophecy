@@ -57,6 +57,72 @@ public class RedisServiceImpl implements RedisService {
     }
 
     /**
+     * key 不存在则 set,key 存在则不做任何动作
+     */
+    @Override
+    public Long setnx(String key, String value) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            Long result = jedis.setnx(key, value);
+            return result;
+        } catch (Exception e) {
+            log.info("redis setnx value error");
+            return 0L;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    /**
+     * 将给定 key 的值设为 value ，并返回 key 的旧值(old value)
+     */
+    @Override
+    public String getSet(String key, String value) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            String result = jedis.getSet(key, value);
+            return result;
+        } catch (Exception e) {
+            log.info("redis getSet value error");
+            return null;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    @Override
+    public Long expire(String key, int seconds) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            Long result = jedis.expire(key, seconds);
+            return result;
+        } catch (Exception e) {
+            log.info("redis expire value error");
+            return 0L;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    @Override
+    public Long del(String key) {
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            Long result = jedis.del(key);
+            return result;
+        } catch (Exception e) {
+            log.info("redis del value error");
+            return 0L;
+        } finally {
+            returnResource(jedis);
+        }
+    }
+
+    /**
      * 异步新增key,并设置key 的生存时间 (以秒为单位)
      * key 存在 则更新
      */

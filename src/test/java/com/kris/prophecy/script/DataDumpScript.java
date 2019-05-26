@@ -1,4 +1,4 @@
-package com.kris.prophecy;
+package com.kris.prophecy.script;
 
 
 import com.alibaba.fastjson.JSONObject;
