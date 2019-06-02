@@ -283,11 +283,11 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
     <insert id="insertUserList" parameterType="java.util.List">
-        insert into user (name, age, password, sex, school, subordinate_class, graduation_time, uid) values
+        insert into user (name, age, password, sex, school, subordinate_class, graduation_time, uid,register_time) values
         <foreach collection="userList" item="user" separator=",">
             (#{user.name,jdbcType=VARCHAR},#{user.age,jdbcType=INTEGER},#{user.password,jdbcType=VARCHAR},
             #{user.sex,jdbcType=VARCHAR},#{user.school,jdbcType=VARCHAR},#{user.subordinateClass,jdbcType=VARCHAR}
-            ,#{user.graduationTime,jdbcType=INTEGER},#{user.uid,jdbcType=VARCHAR})
+            ,#{user.graduationTime,jdbcType=INTEGER},#{user.uid,jdbcType=VARCHAR},#{user.registerTime,jdbcType=VARCHAR})
         </foreach>
     </insert>
 </mapper>

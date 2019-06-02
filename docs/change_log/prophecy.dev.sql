@@ -136,4 +136,5 @@ ALTER TABLE message MODIFY type varchar(15) DEFAULT null  COMMENT '消息类型�
 ALTER TABLE user MODIFY register_time varchar(20) NOT NULL COMMENT '注册时间';
 ALTER TABLE post MODIFY create_time varchar(20) COMMENT '发帖时间';
 ALTER TABLE post_reply MODIFY reply_time varchar(20) COMMENT '回复时间';
+ALTER TABLE interface_usage_statistics MODIFY fail_message varchar(10239);
 
