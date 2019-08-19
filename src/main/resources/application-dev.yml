@@ -51,11 +51,16 @@ kafka:
     linger: 1
     bufferMemory: 40960
 
+#spring自带日志框架
+#logging:
+#  level:
+#    com:
+#      kris:
+#        prophecy: debug
+#  file: C:\Users\xxx\IdeaProjects\prophecy\logs\prophecy.log
+
 logging:
-  level:
-    com:
-      kris:
-        prophecy: debug
+  config: classpath:log4j2-dev.xml
 
 # 百度翻译语言识别
 language:

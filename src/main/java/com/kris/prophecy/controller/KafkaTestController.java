@@ -1,8 +1,5 @@
 package com.kris.prophecy.controller;
 
-import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.enums.DataErrorCode;
-import com.kris.prophecy.model.Result;
 import com.kris.prophecy.model.common.util.Response;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -2,7 +2,6 @@ package com.kris.prophecy.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.Post;
-import com.kris.prophecy.entity.User;
 import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.mapper.PostMapper;

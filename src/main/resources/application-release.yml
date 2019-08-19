@@ -51,11 +51,13 @@ kafka:
     linger: 1
     bufferMemory: 40960
 
+#logging:
+#  level:
+#    com:
+#      kris:
+#        prophecy: debug
 logging:
-  level:
-    com:
-      kris:
-        prophecy: debug
+  config: classpath:log4j2-dev.xml
 
 #百度翻译语言识别
 language:
