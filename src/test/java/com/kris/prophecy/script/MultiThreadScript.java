@@ -36,7 +36,7 @@ public class MultiThreadScript {
 
     private HttpEntity<String> requestEntity;
 
-    private final static String PATH = "xxx";
+    private final static String PATH = "/home/excel/";
 
     @Before
     public void init() {

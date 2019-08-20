@@ -17,7 +17,7 @@ public class GenerateExcelScript {
 
     private final static int EXCEL_SIZE = 1000;
 
-    private final static String PATH = "xxx";
+    private final static String PATH = "/home/excel/";
 
     public static void main(String[] args) throws IOException {
         HSSFWorkbook workbook = new HSSFWorkbook();

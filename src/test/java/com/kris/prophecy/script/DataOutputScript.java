@@ -25,7 +25,7 @@ import java.util.concurrent.*;
  */
 public class DataOutputScript {
 
-    private final static String PATH = "xxx";
+    private final static String PATH = "/home/excel/";
 
     private static ExecutorService threadPool = Executors.newFixedThreadPool(200);
 
