@@ -33,7 +33,7 @@ import java.util.Date;
 @Scope("prototype")
 @ConfigurationProperties(prefix = "mobile")
 @Data
-public class MobileLocationCallable implements ConcurrentCallable {
+public class MobileOperatorCallable implements ConcurrentCallable {
 
     private JSONObject paramJson;
 
