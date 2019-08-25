@@ -1,8 +1,43 @@
 spring:
+  cloud:
+    consul:
+      discovery:
+        ##检测实例健康
+        health-check-path: /actuator/health
+        ##每隔10s检查
+        health-check-interval: 10s
+        ##自动注册
+        register: true
+        ##实例名称
+        service-name: ${spring.application.name}
+        heartbeat:
+          enabled: true
+      #consul地址
+      host: 127.0.0.1
+      port: 8500
+      config:
+        enabled: true
+        ##配置中心解析样式
+        format: yaml
   profiles:
     active: release
+  application:
+    name: prophecy
+
 server:
   port: 8888
+
+ribbon:
+  # ribbon缓存时间，默认30秒
+  ServerListRefreshInterval: 2000
+  ReadTimeout: 5000
+  ConnectTimeout: 5000
+  # 是否所有操作都重试
+  OkToRetryOnAllOperations: false
+  # 重试负载均衡其他的实例最大重试次数,不包括首次server（查询项目可开启）
+  MaxAutoRetriesNextServer: 0
+  # 同一台实例最大重试次数,不包括首次调用
+  MaxAutoRetries: 0
 
 call-class:
   map:
