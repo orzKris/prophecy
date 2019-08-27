@@ -12,8 +12,11 @@ spring:
         service-name: ${spring.application.name}
         heartbeat:
           enabled: true
+        ##启动服务发现
+        enabled: true
+        prefer-ip-address: true
       #consul地址
-      host: 127.0.0.1
+      host: localhost
       port: 8500
       config:
         enabled: true

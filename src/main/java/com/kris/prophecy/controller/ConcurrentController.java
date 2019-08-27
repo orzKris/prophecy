@@ -51,11 +51,10 @@ public class ConcurrentController {
             new BasicThreadFactory.Builder().namingPattern("Schedule-thread-pool-%d").daemon(true).build());
 
     @PostMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Response main(HttpServletRequest request, @PathVariable("id") String id) {
+    public Response main(HttpServletRequest request, @PathVariable("id") String id, @RequestParam("param") String param) {
         long start = System.currentTimeMillis();
         DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        String param = request.getParameter(CommonConstant.PARAM);
         String uid = request.getHeader(CommonConstant.UID);
 
         Response paramResult = checkParam(param, requestTime);
