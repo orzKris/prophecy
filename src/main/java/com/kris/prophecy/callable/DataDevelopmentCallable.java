@@ -31,7 +31,7 @@ public class DataDevelopmentCallable implements ConcurrentCallable {
     private JSONObject paramJson;
 
     @Autowired
-    MongoService mongoService;
+    private MongoService mongoService;
 
     @Override
     public void init(JSONObject paramJson) {

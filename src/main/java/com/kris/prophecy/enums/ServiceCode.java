@@ -15,6 +15,8 @@ public class ServiceCode {
     /**
      * 接口名称
      */
+    public static final String GDP = "地区生产总值";
+
     public static final String LANGUAGE_DETECT = "语言识别";
 
     public static final String ADDRESS_RESOLUTION = "经纬度地址解析";

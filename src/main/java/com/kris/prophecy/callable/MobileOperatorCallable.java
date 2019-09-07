@@ -44,10 +44,10 @@ public class MobileOperatorCallable implements ConcurrentCallable {
     private int timeOut = 5000;
 
     @Autowired
-    DispatchService dispatchService;
+    private DispatchService dispatchService;
 
     @Autowired
-    RedisService redisService;
+    private RedisService redisService;
 
     @Override
     public void init(JSONObject paramJson) {

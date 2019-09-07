@@ -87,3 +87,9 @@ mobile:
   url: http://tcc.taobao.com/cc/json/mobile_tel_segment.htm
   timeOut: 5000
   isEnable: true
+# 地区生产总值
+gdp:
+  url: http://data.stats.gov.cn/search.htm
+  searchKey: searchdata
+  timeOut: 2000
+  isEnable: true

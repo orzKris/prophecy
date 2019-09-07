@@ -50,7 +50,7 @@ public class FaceDetectionCallable implements ConcurrentCallable {
     private int timeOut = 5000;
 
     @Autowired
-    DispatchService dispatchService;
+    private DispatchService dispatchService;
 
     @Override
     public void init(JSONObject paramJson) {

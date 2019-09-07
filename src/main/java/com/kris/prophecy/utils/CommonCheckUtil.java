@@ -30,6 +30,10 @@ public class CommonCheckUtil {
         return StringUtils.isNumeric(number);
     }
 
+    public static boolean validateYear(String number) {
+        return StringUtils.isNumeric(number) && 1949 < Integer.parseInt(number) && Integer.parseInt(number) < 2018;
+    }
+
     /**
      * 校验手机号是否合法
      *

@@ -34,7 +34,7 @@ import java.util.Map;
 public class LanguageDetectCallable implements ConcurrentCallable {
 
     @Autowired
-    MongoService mongoService;
+    private MongoService mongoService;
 
     private JSONObject paramJson;
 
