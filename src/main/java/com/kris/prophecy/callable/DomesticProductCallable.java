@@ -1,5 +1,6 @@
 package com.kris.prophecy.callable;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.constant.DomesticProductConstant;
 import com.kris.prophecy.enums.*;
@@ -82,14 +83,14 @@ public class DomesticProductCallable implements ConcurrentCallable {
                 "0" : paramJson.getString(DomesticProductConstant.PAGE);
         String conditionMessage = String.format("year=%s,area=%s,page=%s", year, area, page);
         try {
-            return getData(year, area, page, requestTime);
+            return getData(year, area, page);
         } catch (Exception e) {
             LogUtil.logError(requestTime, conditionMessage, "请求国家统计局地区生产总值接口失败", e);
             return new Result(DataErrorCode.FAIL);
         }
     }
 
-    private Result getData(String year, String area, String page, String requestTime) throws IOException {
+    private Result getData(String year, String area, String page) throws IOException {
         JSONObject queryString = new JSONObject();
         queryString.put(DomesticProductConstant.DATASOURCE_SEARCH, year + area + DomesticProductConstant.GROSS_DOMESTIC_PRODUCT);
         queryString.put(DomesticProductConstant.SEARCH_KEY, searchKey);
@@ -109,7 +110,7 @@ public class DomesticProductCallable implements ConcurrentCallable {
                 .build();
         Result result = dispatchService.dispatch(dispatchRequest, true);
         if (DataFromEnum.DATA_FROM_DATASOURCE == result.getDataFrom()) {
-            return dealQueryResult(result, dispatchRequest);
+        return dealQueryResult(result, dispatchRequest);
         }
         return result;
     }
@@ -121,6 +122,16 @@ public class DomesticProductCallable implements ConcurrentCallable {
     }
 
     private Result dealQueryResult(Result result, DispatchRequest dispatchRequest) {
+        JSONObject jsonResult = result.getJsonResult();
+        JSONArray resultArray = jsonResult.getJSONArray(DomesticProductConstant.RESULT);
+        for (int i = 0; i < resultArray.size(); i++) {
+            resultArray.getJSONObject(i).remove(DomesticProductConstant.PRANK);
+            resultArray.getJSONObject(i).remove(DomesticProductConstant.RANK);
+            resultArray.getJSONObject(i).remove(DomesticProductConstant.REPORT);
+            resultArray.getJSONObject(i).remove(DomesticProductConstant.EXP);
+        }
+        jsonResult.put(DomesticProductConstant.RESULT, resultArray);
+        result.setJsonResult(jsonResult);
         redisService.asyncSet(dispatchRequest.getKey(), result.getJsonResult().toJSONString(), 30 * 24 * 3600);
         return result;
     }

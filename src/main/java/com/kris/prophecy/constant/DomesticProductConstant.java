@@ -16,4 +16,14 @@ public final class DomesticProductConstant {
 
     public static final String GROSS_DOMESTIC_PRODUCT = "地区生产总值";
 
+    public static final String PRANK = "prank";
+
+    public static final String RANK = "rank";
+
+    public static final String REPORT = "report";
+
+    public static final String RESULT = "result";
+
+    public static final String EXP = "exp";
+
 }
