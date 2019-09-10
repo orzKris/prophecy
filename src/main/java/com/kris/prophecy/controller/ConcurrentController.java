@@ -29,6 +29,12 @@ import java.util.concurrent.*;
 /**
  * @author by Kris on 2018/12/19.
  * 请求统一管理接口
+ *
+ * CompletionService与ExecutorService最主要的区别在于submit的task不一定是按照加入时的顺序完成的。
+ * CompletionService对ExecutorService进行了包装，内部维护一个保存Future对象的BlockingQueue。
+ * 只有当这个Future对象状态是结束的时候，才会加入到这个Queue中，take()方法其实就是Producer-Consumer中的Consumer。
+ * 它会从Queue中取出Future对象，如果Queue是空的，就会阻塞在那里，直到有完成的Future对象加入到Queue中。
+ * 所以，先完成的必定先被取出。这样就减少了不必要的等待时间。
  */
 @RequestMapping(value = "/concurrent")
 @RestController
