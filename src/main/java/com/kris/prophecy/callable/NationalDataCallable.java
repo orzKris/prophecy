@@ -2,7 +2,7 @@ package com.kris.prophecy.callable;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.constant.DomesticProductConstant;
+import com.kris.prophecy.constant.NationalDataConstant;
 import com.kris.prophecy.enums.*;
 import com.kris.prophecy.framework.ConcurrentCallable;
 import com.kris.prophecy.framework.DispatchService;
@@ -16,6 +16,7 @@ import com.kris.prophecy.utils.LogUtil;
 import lombok.Data;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Scope;
@@ -30,11 +31,11 @@ import java.util.Date;
  * @author Kris
  * @date 2019/3/13
  */
-@Component(ServiceCode.GDP)
+@Component(ServiceCode.NATIONAL_DATA)
 @Scope("prototype")
-@ConfigurationProperties(prefix = "gdp")
+@ConfigurationProperties(prefix = "data")
 @Data
-public class DomesticProductCallable implements ConcurrentCallable {
+public class NationalDataCallable implements ConcurrentCallable {
 
     private JSONObject paramJson;
 
@@ -59,14 +60,11 @@ public class DomesticProductCallable implements ConcurrentCallable {
 
     @Override
     public Result checkParam(JSONObject paramJson) {
-        if (!CommonCheckUtil.validateYear(paramJson.getString(DomesticProductConstant.YEAR))) {
-            return Result.fail("year invalid !");
+        if (StringUtils.isBlank(paramJson.getString(NationalDataConstant.SEARCH_PHRASE))) {
+            return Result.fail("key invalid !");
         }
-        if (!CommonCheckUtil.validateString(paramJson.getString(DomesticProductConstant.AREA))) {
-            return Result.fail("area invalid !");
-        }
-        if (paramJson.containsKey(DomesticProductConstant.PAGE)) {
-            if (!CommonCheckUtil.validateNumber(paramJson.getString(DomesticProductConstant.PAGE))) {
+        if (paramJson.containsKey(NationalDataConstant.PAGE)) {
+            if (!CommonCheckUtil.validateNumber(paramJson.getString(NationalDataConstant.PAGE))) {
                 return Result.fail("page invalid !");
             }
         }
@@ -77,28 +75,26 @@ public class DomesticProductCallable implements ConcurrentCallable {
     public Result call() {
         DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        String year = paramJson.getString(DomesticProductConstant.YEAR);
-        String area = paramJson.getString(DomesticProductConstant.AREA);
-        String page = paramJson.getString(DomesticProductConstant.PAGE) == null ?
-                "0" : paramJson.getString(DomesticProductConstant.PAGE);
-        String conditionMessage = String.format("year=%s,area=%s,page=%s", year, area, page);
+        String key = paramJson.getString(NationalDataConstant.SEARCH_PHRASE);
+        String page = paramJson.getString(NationalDataConstant.PAGE) == null ?
+                "0" : paramJson.getString(NationalDataConstant.PAGE);
+        String conditionMessage = String.format("key=%s,page=%s", key, page);
         try {
-            return getData(year, area, page);
+            return getData(key, page);
         } catch (Exception e) {
-            LogUtil.logError(requestTime, conditionMessage, "请求国家统计局地区生产总值接口失败", e);
+            LogUtil.logError(requestTime, conditionMessage, "请求国家统计局国家数据接口失败", e);
             return new Result(DataErrorCode.FAIL);
         }
     }
 
-    private Result getData(String year, String area, String page) throws IOException {
+    private Result getData(String key, String page) throws IOException {
         JSONObject queryString = new JSONObject();
-        queryString.put(DomesticProductConstant.DATASOURCE_SEARCH, year + area + DomesticProductConstant.GROSS_DOMESTIC_PRODUCT);
-        queryString.put(DomesticProductConstant.SEARCH_KEY, searchKey);
-        queryString.put(DomesticProductConstant.DATASOURCE_PAGE, page);
+        queryString.put(NationalDataConstant.DATASOURCE_SEARCH, key);
+        queryString.put(NationalDataConstant.SEARCH_KEY, searchKey);
+        queryString.put(NationalDataConstant.DATASOURCE_PAGE, page);
         JSONObject keyString = new JSONObject();
-        keyString.put(DomesticProductConstant.YEAR, year);
-        keyString.put(DomesticProductConstant.AREA, area);
-        keyString.put(DomesticProductConstant.PAGE, page);
+        keyString.put(NationalDataConstant.SEARCH_PHRASE, key);
+        keyString.put(NationalDataConstant.PAGE, page);
         DispatchRequest dispatchRequest = DispatchRequest.builder()
                 .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D006.getId()))
                 .request(getRequest(queryString))
@@ -110,7 +106,7 @@ public class DomesticProductCallable implements ConcurrentCallable {
                 .build();
         Result result = dispatchService.dispatch(dispatchRequest, true);
         if (DataFromEnum.DATA_FROM_DATASOURCE == result.getDataFrom()) {
-        return dealQueryResult(result, dispatchRequest);
+            return dealQueryResult(result, dispatchRequest);
         }
         return result;
     }
@@ -123,14 +119,14 @@ public class DomesticProductCallable implements ConcurrentCallable {
 
     private Result dealQueryResult(Result result, DispatchRequest dispatchRequest) {
         JSONObject jsonResult = result.getJsonResult();
-        JSONArray resultArray = jsonResult.getJSONArray(DomesticProductConstant.RESULT);
+        JSONArray resultArray = jsonResult.getJSONArray(NationalDataConstant.RESULT);
         for (int i = 0; i < resultArray.size(); i++) {
-            resultArray.getJSONObject(i).remove(DomesticProductConstant.PRANK);
-            resultArray.getJSONObject(i).remove(DomesticProductConstant.RANK);
-            resultArray.getJSONObject(i).remove(DomesticProductConstant.REPORT);
-            resultArray.getJSONObject(i).remove(DomesticProductConstant.EXP);
+            resultArray.getJSONObject(i).remove(NationalDataConstant.PRANK);
+            resultArray.getJSONObject(i).remove(NationalDataConstant.RANK);
+            resultArray.getJSONObject(i).remove(NationalDataConstant.REPORT);
+            resultArray.getJSONObject(i).remove(NationalDataConstant.EXP);
         }
-        jsonResult.put(DomesticProductConstant.RESULT, resultArray);
+        jsonResult.put(NationalDataConstant.RESULT, resultArray);
         result.setJsonResult(jsonResult);
         redisService.asyncSet(dispatchRequest.getKey(), result.getJsonResult().toJSONString(), 30 * 24 * 3600);
         return result;

@@ -12,7 +12,7 @@ public enum ServiceIdEnum {
     D003("D003", "人脸检测"),
     D004("D004", "影讯合集"),
     D005("D005", "手机归属地"),
-    D006("D006", "地区生产总值");
+    D006("D006", "国家数据");
 
     private String id;
     private String desc;
