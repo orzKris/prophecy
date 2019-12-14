@@ -23,9 +23,11 @@ spring:
         ##配置中心解析样式
         format: yaml
   profiles:
-    active: release
+    active: dev
   application:
     name: prophecy
+  main:
+    banner-mode: console
 
 server:
   port: 8888

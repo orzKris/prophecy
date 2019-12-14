@@ -3,8 +3,8 @@ com:
     datasource:
       prophecy:
         url: jdbc:mysql://localhost:3306/prophecy?useUnicode=true&characterEncoding=utf8&autoReconnect=true
-        username: debian-sys-maint
-        password: 33NfmKUDjW6n5PHD
+        username: root
+        password: root
 
 spring:
   redis:
