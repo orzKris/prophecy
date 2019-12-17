@@ -26,8 +26,6 @@ spring:
     active: dev
   application:
     name: prophecy
-  main:
-    banner-mode: console
 
 server:
   port: 8888

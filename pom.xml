@@ -226,7 +226,6 @@
             </exclusions>
         </dependency>
 
-
     </dependencies>
 
     <dependencyManagement>
@@ -341,14 +340,6 @@
                     <include>**/*.xml</include>
                 </includes>
                 <filtering>false</filtering>
-            </resource>
-            <!--加如下配置防止resources目录下的spring配置文件找不到（在项目的web模块下）-->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
             </resource>
         </resources>
     </build>
