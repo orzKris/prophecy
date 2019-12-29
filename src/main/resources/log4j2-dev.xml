@@ -25,5 +25,8 @@
             <AppenderRef ref="File"/>
             <appender-ref ref="Console"/>
         </AsyncRoot>
+        <!--打印sql信息-->
+        <logger name="com.kris.prophecy.mapper" level="DEBUG"></logger>
+        <logger name="org.mybatis" level="DEBUG"></logger>
     </loggers>
 </Configuration>
