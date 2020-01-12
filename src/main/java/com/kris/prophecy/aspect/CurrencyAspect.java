@@ -44,10 +44,15 @@ public class CurrencyAspect {
         String uid = (String) args[1];
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("uid", uid);
-        jsonObject.put("accountName", virtualCurrency.getAccountName());
-        jsonObject.put("transaction", virtualCurrency.getTransaction());
-        jsonObject.put("balance", userMapper.selectByUid(uid).getBalance());
+        if (userMapper.selectByName(virtualCurrency.getAccountName()) != null) {
+            jsonObject.put("uid", uid);
+            jsonObject.put("accountName", virtualCurrency.getAccountName());
+            jsonObject.put("transaction", virtualCurrency.getTransaction());
+            jsonObject.put("balance", userMapper.selectByUid(uid).getBalance());
+        } else {
+            jsonObject.put("充值结果", "该账户不存在！");
+        }
+
         response = new Response<>(response.getResponseCode(), response.getMessage(), jsonObject);
         return response;
     }
