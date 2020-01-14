@@ -130,17 +130,15 @@ CREATE TABLE `like_statistics` (
 -- ----------------------------
 DROP TABLE IF EXISTS `attention`;
 CREATE TABLE `attention` (
-                             `id` int(11) NOT NULL AUTO_INCREMENT,
-                             `aid` int(11) NOT NULL COMMENT '关注人id',
-                             `pid` int(11) NOT NULL COMMENT '被关注人id',
-                             `attention_time` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
-                             PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '关注人uid',
+  `pid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '被关注人uid',
+  `attention_time` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
 
-ALTER TABLE `prophecy`.`interface_usage_statistics`
-  CHANGE COLUMN `status` `status` VARCHAR(45) NULL DEFAULT '00' ;
-ALTER TABLE `prophecy`.`interface_usage_statistics`
-  CHANGE COLUMN `fail_message` `fail_message` VARCHAR(1023) NULL DEFAULT NULL ;
+ALTER TABLE `prophecy`.`interface_usage_statistics` CHANGE COLUMN `status` `status` VARCHAR(45) NULL DEFAULT '00' ;
+ALTER TABLE `prophecy`.`interface_usage_statistics` CHANGE COLUMN `fail_message` `fail_message` VARCHAR(1023) NULL DEFAULT NULL ;
 ALTER TABLE message MODIFY uid varchar(511) NOT NULL COMMENT '目标用户ID，0-发给所有人';
 ALTER TABLE message MODIFY publisher_uid varchar(511) COMMENT '发布人用户ID';
 ALTER TABLE message_status MODIFY uid varchar(511) NOT NULL COMMENT '用户ID';
@@ -149,6 +147,7 @@ ALTER TABLE user MODIFY register_time varchar(20) NOT NULL COMMENT '注册时间
 ALTER TABLE post MODIFY create_time varchar(20) COMMENT '发帖时间';
 ALTER TABLE post_reply MODIFY reply_time varchar(20) COMMENT '回复时间';
 ALTER TABLE interface_usage_statistics MODIFY fail_message varchar(10239);
+
 
 
 
