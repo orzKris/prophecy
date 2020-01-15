@@ -53,11 +53,11 @@ public class UserController {
     }
 
     /**
-     * 校名年份查询用户信息
+     * 条件查询用户信息
      */
     @GetMapping(value = "/list", produces = "application/json;charset=UTF-8")
-    public Response getSchool(User user, Pageable pageable) {
-        List<User> userList = userService.getSchool(user, pageable);
+    public Response getUsers(User user, Pageable pageable) {
+        List<User> userList = userService.getUsers(user, pageable);
         Long count = userService.getCount(user);
         Page<User> results = new PageImpl<>(userList, pageable, count);
         return Response.ok(results);

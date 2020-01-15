@@ -27,14 +27,29 @@ public class AttentionServiceImpl implements AttentionService {
     }
 
     @Override
-    public Response insertAttention(String uid, String pid) {
+    public Response attentionOperation(String uid, String pid, int flag) {
         DateFormat dateFormat = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String time = dateFormat.format(new Date());
-        int ret = attentionMapper.insertAttention(uid, pid, time);
-        if (ret == 1) {
+        int initFlag = attentionMapper.getAttentionStatus(uid, pid) == null ? 0 : attentionMapper.getAttentionStatus(uid, pid);
+        if (initFlag == flag) {
+            return Response.message("操作不合法！");
+        }
+        attentionMapper.insertAttentionStatistics(uid, pid, time, flag);
+        attentionMapper.changeAttentionStatus(uid, pid, flag);
+        if (flag == 1) {
             return Response.message("关注成功！");
         } else {
-            return Response.message("关注失败！");
+            return Response.message("取关成功！");
         }
+    }
+
+    @Override
+    public Response getMyConcerned(String uid) {
+        return null;
+    }
+
+    @Override
+    public Response getMyFans(String uid) {
+        return null;
     }
 }

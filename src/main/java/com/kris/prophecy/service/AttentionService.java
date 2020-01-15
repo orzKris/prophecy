@@ -1,6 +1,5 @@
 package com.kris.prophecy.service;
 
-import com.kris.prophecy.entity.User;
 import com.kris.prophecy.model.common.util.Response;
 
 public interface AttentionService {
@@ -11,9 +10,18 @@ public interface AttentionService {
     boolean selectUid(String pid);
 
     /**
-     * 关注用户
+     * 关注用户操作
      */
-    Response insertAttention(String uid,String pid);
+    Response attentionOperation(String uid, String pid,int flag);
 
+    /**
+     * 获取我的关注列表
+     */
+    Response getMyConcerned(String uid);
+
+    /**
+     * 获取我的粉丝列表
+     */
+    Response getMyFans(String uid);
 
 }

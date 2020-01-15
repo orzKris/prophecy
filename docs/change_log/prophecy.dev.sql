@@ -126,16 +126,30 @@ CREATE TABLE `like_statistics` (
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
 
 -- ----------------------------
---  Table structure for `attention`
+--  Table structure for `attention_statistics`
 -- ----------------------------
-DROP TABLE IF EXISTS `attention`;
-CREATE TABLE `attention` (
+DROP TABLE IF EXISTS `attention_statistics`;
+CREATE TABLE `attention_statistics` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `aid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '关注人uid',
   `pid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '被关注人uid',
   `attention_time` varchar(20) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `attention_operation` int(11) DEFAULT NULL COMMENT '关注操作，1-关注，2-取关',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ----------------------------
+--  Table structure for `attention_status`
+-- ----------------------------
+DROP TABLE IF EXISTS `attention_status`;
+CREATE TABLE `attention_status` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `aid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '关注人uid',
+  `pid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '被关注人uid',
+  `status` int(11) NOT NULL COMMENT '关注状态，1-有效，0-无效',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `attention_status_aid_pid_uindex` (`aid`,`pid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 ALTER TABLE `prophecy`.`interface_usage_statistics` CHANGE COLUMN `status` `status` VARCHAR(45) NULL DEFAULT '00' ;
 ALTER TABLE `prophecy`.`interface_usage_statistics` CHANGE COLUMN `fail_message` `fail_message` VARCHAR(1023) NULL DEFAULT NULL ;

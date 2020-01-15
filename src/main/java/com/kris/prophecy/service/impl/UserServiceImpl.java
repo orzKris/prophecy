@@ -1,6 +1,5 @@
 package com.kris.prophecy.service.impl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.kris.prophecy.entity.User;
 import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.enums.UserErrorCode;
@@ -70,10 +69,10 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * 校名年份查询用户信息
+     * 条件查询用户信息
      */
     @Override
-    public List<User> getSchool(User user, Pageable pageable) {
+    public List<User> getUsers(User user, Pageable pageable) {
         List<User> userList = userMapper.selectList(user, pageable);
         return userList;
     }

@@ -30,7 +30,7 @@ public interface UserService {
     /**
      * 校名查询用户信息
      */
-    List<User> getSchool(User user, Pageable pageable);
+    List<User> getUsers(User user, Pageable pageable);
 
     /**
      * 统计用户数量
