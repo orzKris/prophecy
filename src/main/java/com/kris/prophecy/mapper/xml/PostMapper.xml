@@ -73,8 +73,7 @@
     <select id="selectDetailName" resultMap="ResultMapII">
         select pr.id,u.name as reply_name,pr.content as reply_content,pr.reply_time,pr.rid
         from post_reply pr left join user u on pr.uid=u.uid
-        where 1=1
-        and  pr.id in
+        where pr.id in
         (
         <foreach collection="rids" item="rid" separator=",">
             #{rid,jdbcType=INTEGER}

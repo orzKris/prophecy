@@ -147,6 +147,7 @@ CREATE TABLE `attention_status` (
   `aid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '关注人uid',
   `pid` varchar(45) COLLATE utf8mb4_general_ci NOT NULL COMMENT '被关注人uid',
   `status` int(11) NOT NULL COMMENT '关注状态，1-有效，0-无效',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `attention_status_aid_pid_uindex` (`aid`,`pid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;

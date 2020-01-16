@@ -1,5 +1,6 @@
 package com.kris.prophecy.service.impl;
 
+import com.kris.prophecy.entity.User;
 import com.kris.prophecy.enums.CommonConstant;
 import com.kris.prophecy.mapper.AttentionMapper;
 import com.kris.prophecy.mapper.UserMapper;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Component;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class AttentionServiceImpl implements AttentionService {
@@ -44,12 +46,14 @@ public class AttentionServiceImpl implements AttentionService {
     }
 
     @Override
-    public Response getMyConcerned(String uid) {
-        return null;
+    public List<User> getMyConcernedOrFans(String uid, int flag) {
+        List<String> uidList;
+        if (flag == 1) {
+            uidList = attentionMapper.pidList(uid);
+        } else {
+            uidList = attentionMapper.uidList(uid);
+        }
+        return userMapper.listSelect(uidList);
     }
 
-    @Override
-    public Response getMyFans(String uid) {
-        return null;
-    }
 }

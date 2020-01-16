@@ -1,10 +1,15 @@
 package com.kris.prophecy.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.kris.prophecy.entity.User;
 import com.kris.prophecy.enums.UserErrorCode;
 import com.kris.prophecy.model.common.util.Response;
 import com.kris.prophecy.service.AttentionService;
+import com.kris.prophecy.utils.PageData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @author Kris
@@ -32,11 +37,18 @@ public class AttentionController {
     }
 
     /**
-     * 我的关注列表接口
+     * 获取我的关注或我的粉丝列表接口,flag：1-我的关注，0-我的粉丝
      */
-    @GetMapping(value = "/myConcerned", produces = "application/json;charset=UTF-8")
-    public Response myConcerned(@RequestHeader("uid") String uid) {
-        return attentionService.getMyConcerned(uid);
+    @GetMapping(value = "/myConcernedOrFans", produces = "application/json;charset=UTF-8")
+    public Response myConcernedOrFans(@RequestHeader("uid") String uid, @RequestParam("flag") int flag,
+                                      @RequestParam(required = false) Integer page,
+                                      @RequestParam(required = false) Integer pageSize) {
+        pageSize = (pageSize == null || pageSize < 0 ? 10 : pageSize);
+        page = (page == null || page < 1 ? 1 : page);
+        PageHelper.startPage(page, pageSize);
+        List<User> users = attentionService.getMyConcernedOrFans(uid, flag);
+        PageData<User> userPageData = new PageData<>(users, pageSize);
+        return Response.ok(userPageData);
     }
 
 }

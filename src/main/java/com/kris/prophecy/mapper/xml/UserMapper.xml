@@ -84,6 +84,21 @@
             </if>
         </if>
     </select>
+    <select id="listSelect" resultType="com.kris.prophecy.entity.User">
+        select
+        <include refid="Base_Column_List"/>
+        from user where uid in
+        (
+        <foreach collection="uidList" item="uid" separator="','">
+            #{uid,jdbcType=VARCHAR}
+        </foreach>
+        )
+        order by instr(
+        <foreach collection="uidList" item="uid" separator=",">
+            #{uid,jdbcType=VARCHAR}
+        </foreach>
+        ,uid)
+    </select>
     <select id="selectCount" resultType="java.lang.Long">
         select count(*)
         from user where 1 = 1
@@ -118,24 +133,6 @@
             and register_time = #{registerTime,jdbcType=DATE}
         </if>
     </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        delete
-        from user
-        where id = #{id,jdbcType=INTEGER}
-    </delete>
-    <insert id="insert" parameterType="com.kris.prophecy.entity.User">
-        insert into user (id, name, age, password, sex, school, subordinate_class, graduation_time, register_time, uid)
-        values (#{id,jdbcType=INTEGER},
-                #{name,jdbcType=VARCHAR},
-                #{age,jdbcType=INTEGER},
-                #{password,jdbcType=VARCHAR},
-                #{sex,jdbcType=VARCHAR},
-                #{school,jdbcType=VARCHAR},
-                #{subordinateClass,jdbcType=VARCHAR},
-                #{graduationTime,jdbcType=INTEGER},
-                #{registerTime,jdbcType=TIMESTAMP},
-                #{uid,jdbcType=VARCHAR})
-    </insert>
     <insert id="insertSelective" parameterType="com.kris.prophecy.entity.User">
         insert into user
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -269,21 +266,9 @@
         </set>
         where name = #{param1.name,jdbcType=VARCHAR}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.kris.prophecy.entity.User">
-        update user
-        set name              = #{name,jdbcType=VARCHAR},
-            age               = #{age,jdbcType=INTEGER},
-            password          = #{password,jdbcType=VARCHAR},
-            sex               = #{sex,jdbcType=VARCHAR},
-            school            = #{school,jdbcType=VARCHAR},
-            subordinate_class = #{subordinateClass,jdbcType=VARCHAR},
-            graduation_time   = #{graduationTime,jdbcType=INTEGER},
-            register_time     = #{registerTime,jdbcType=TIMESTAMP},
-            uid               = #{uid,jdbcType=VARCHAR}
-        where id = #{id,jdbcType=INTEGER}
-    </update>
     <insert id="insertUserList" parameterType="java.util.List">
-        insert into user (name, age, password, sex, school, subordinate_class, graduation_time, uid,register_time) values
+        insert into user (name, age, password, sex, school, subordinate_class, graduation_time, uid,register_time)
+        values
         <foreach collection="userList" item="user" separator=",">
             (#{user.name,jdbcType=VARCHAR},#{user.age,jdbcType=INTEGER},#{user.password,jdbcType=VARCHAR},
             #{user.sex,jdbcType=VARCHAR},#{user.school,jdbcType=VARCHAR},#{user.subordinateClass,jdbcType=VARCHAR}

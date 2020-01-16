@@ -36,7 +36,12 @@ public interface UserMapper {
     /**
      * 列表查询
      */
-    List<User> selectList(@Param("user") User user,@Param("pageable") Pageable pageable);
+    List<User> selectList(@Param("user") User user, @Param("pageable") Pageable pageable);
+
+    /**
+     * 列表查询，参数为uid list
+     */
+    List<User> listSelect(@Param("uidList") List<String> uidList);
 
     /**
      * 统计用户数量
