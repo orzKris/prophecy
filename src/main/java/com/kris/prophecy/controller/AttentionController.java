@@ -43,6 +43,9 @@ public class AttentionController {
     public Response myConcernedOrFans(@RequestHeader("uid") String uid, @RequestParam("flag") int flag,
                                       @RequestParam(required = false) Integer page,
                                       @RequestParam(required = false) Integer pageSize) {
+        if (flag != 1 && flag != 0) {
+            return Response.error(UserErrorCode.PARAM_ERROR);
+        }
         pageSize = (pageSize == null || pageSize < 0 ? 10 : pageSize);
         page = (page == null || page < 1 ? 1 : page);
         PageHelper.startPage(page, pageSize);
