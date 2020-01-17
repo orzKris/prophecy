@@ -37,13 +37,13 @@ public class FrequencyFilter implements Filter {
 
         String tokenId = request.getHeader("uid");
         String url = request.getRequestURI();
-        Long curentTime = System.currentTimeMillis();
+        Long currentTime = System.currentTimeMillis();
         Long lastTime = 0L;
         Object str = redisTemplate.opsForValue().get(tokenId + url);
         if (null != str) {
             lastTime = Long.valueOf(str.toString());
         }
-        if (curentTime - lastTime < REQUEST_INTERVAL) {
+        if (currentTime - lastTime < REQUEST_INTERVAL) {
             redisTemplate.opsForValue().set(tokenId + url, System.currentTimeMillis() + "", 1, TimeUnit.MINUTES);
             response.setContentType("application/json;charset=UTF-8");
             Writer writer = response.getWriter();
