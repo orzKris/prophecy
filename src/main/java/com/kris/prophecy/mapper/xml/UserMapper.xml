@@ -89,12 +89,12 @@
         <include refid="Base_Column_List"/>
         from user where uid in
         (
-        <foreach collection="uidList" item="uid" separator="','">
+        <foreach collection="uidList" item="uid" separator=",">
             #{uid,jdbcType=VARCHAR}
         </foreach>
         )
         order by instr(
-        <foreach collection="uidList" item="uid" separator=",">
+        <foreach collection="uidList" item="uid" separator="">
             #{uid,jdbcType=VARCHAR}
         </foreach>
         ,uid)

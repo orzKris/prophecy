@@ -21,6 +21,6 @@ public interface AttentionMapper {
     @Select("select pid from attention_status where aid = #{uid} and status = 1 order by update_time desc")
     List<String> pidList(@Param("uid") String uid);
 
-    @Select("select uid from attention_status where pid = #{pid} and status = 1 order by update_time desc")
+    @Select("select aid from attention_status where pid = #{pid} and status = 1 order by update_time desc")
     List<String> uidList(@Param("pid") String pid);
 }

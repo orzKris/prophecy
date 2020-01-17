@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,9 @@ public class AttentionServiceImpl implements AttentionService {
             uidList = attentionMapper.pidList(uid);
         } else {
             uidList = attentionMapper.uidList(uid);
+        }
+        if (uidList.size() == 0) {
+            return new ArrayList<>();
         }
         return userMapper.listSelect(uidList);
     }
