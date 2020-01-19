@@ -15,6 +15,8 @@ public class ServiceCode {
     /**
      * 接口名称
      */
+    public static final String BEAUTY_GIRLS = "淘女郎查询";
+
     public static final String NATIONAL_DATA = "国家数据";
 
     public static final String LANGUAGE_DETECT = "语言识别";

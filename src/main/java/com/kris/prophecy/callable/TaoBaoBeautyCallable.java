@@ -1,22 +1,17 @@
 package com.kris.prophecy.callable;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.kris.prophecy.constant.NationalDataConstant;
+import com.kris.prophecy.constant.TaoBaoBeautyConstant;
 import com.kris.prophecy.enums.*;
 import com.kris.prophecy.framework.ConcurrentCallable;
 import com.kris.prophecy.framework.DispatchService;
 import com.kris.prophecy.framework.RedisService;
 import com.kris.prophecy.model.DispatchRequest;
 import com.kris.prophecy.model.Result;
-import com.kris.prophecy.utils.AppendUrlUtil;
-import com.kris.prophecy.utils.CommonCheckUtil;
-import com.kris.prophecy.utils.KeyUtil;
-import com.kris.prophecy.utils.LogUtil;
+import com.kris.prophecy.utils.*;
 import lombok.Data;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Scope;
@@ -29,19 +24,20 @@ import java.util.Date;
 
 /**
  * @author Kris
- * @date 2019/3/13
+ * @date 2020/1/19
  */
-@Component(ServiceCode.NATIONAL_DATA)
+@Component(ServiceCode.BEAUTY_GIRLS)
 @Scope("prototype")
-@ConfigurationProperties(prefix = "data")
+@ConfigurationProperties(prefix = "beauty")
 @Data
-public class NationalDataCallable implements ConcurrentCallable {
-
+public class TaoBaoBeautyCallable implements ConcurrentCallable {
     private JSONObject paramJson;
 
     private String url;
 
-    private String searchKey;
+    private String appId;
+
+    private String appSecret;
 
     private boolean isEnable = true;
 
@@ -60,11 +56,11 @@ public class NationalDataCallable implements ConcurrentCallable {
 
     @Override
     public Result checkParam(JSONObject paramJson) {
-        if (StringUtils.isBlank(paramJson.getString(NationalDataConstant.SEARCH_PHRASE))) {
-            return Result.fail("key invalid !");
+        if (!BeautyTypeEnum.hasType(paramJson.getString(TaoBaoBeautyConstant.TYPE))) {
+            return Result.fail("type invalid !");
         }
-        if (paramJson.containsKey(NationalDataConstant.PAGE)) {
-            if (!CommonCheckUtil.validateNumber(paramJson.getString(NationalDataConstant.PAGE))) {
+        if (paramJson.containsKey(TaoBaoBeautyConstant.PAGE)) {
+            if (!CommonCheckUtil.validateNumber(paramJson.getString(TaoBaoBeautyConstant.PAGE))) {
                 return Result.fail("page invalid !");
             }
         }
@@ -75,31 +71,33 @@ public class NationalDataCallable implements ConcurrentCallable {
     public Result call() {
         DateFormat df = new SimpleDateFormat(CommonConstant.DATE_FORMAT_DEFAULT);
         String requestTime = df.format(new Date());
-        String key = paramJson.getString(NationalDataConstant.SEARCH_PHRASE);
-        String page = paramJson.getString(NationalDataConstant.PAGE) == null ?
-                "0" : paramJson.getString(NationalDataConstant.PAGE);
-        String conditionMessage = String.format("key=%s,page=%s", key, page);
+        String type = BeautyTypeEnum.getTypeDesc(paramJson.getString(TaoBaoBeautyConstant.TYPE));
+        String page = paramJson.getString(TaoBaoBeautyConstant.PAGE) == null ?
+                "0" : paramJson.getString(TaoBaoBeautyConstant.PAGE);
+        String conditionMessage = String.format("type=%s,page=%s", type, page);
         try {
-            return getData(key, page);
+            return getData(type, page);
         } catch (Exception e) {
-            LogUtil.logError(requestTime, conditionMessage, "请求国家统计局国家数据接口失败", e);
+            LogUtil.logError(requestTime, conditionMessage, "请求淘女郎查询接口失败", e);
             return new Result(DataErrorCode.FAIL);
         }
     }
 
-    private Result getData(String key, String page) throws IOException {
+    private Result getData(String type, String page) throws IOException {
         JSONObject queryString = new JSONObject();
-        queryString.put(NationalDataConstant.DATASOURCE_SEARCH, key);
-        queryString.put(NationalDataConstant.SEARCH_KEY, searchKey);
-        queryString.put(NationalDataConstant.DATASOURCE_PAGE, page);
+        queryString.put(TaoBaoBeautyConstant.PAGE, page);
+        queryString.put(TaoBaoBeautyConstant.SHOW_API_APP_ID, appId);
+        queryString.put(TaoBaoBeautyConstant.SHOW_API_TIMESTAMP, BeautySignUtil.generateTimestamp());
+        queryString.put(TaoBaoBeautyConstant.TYPE, type);
+        queryString.put(TaoBaoBeautyConstant.SHOW_API_SIGN, BeautySignUtil.signRequest(queryString, appSecret));
         JSONObject keyString = new JSONObject();
-        keyString.put(NationalDataConstant.SEARCH_PHRASE, key);
-        keyString.put(NationalDataConstant.PAGE, page);
+        keyString.put(TaoBaoBeautyConstant.TYPE, type);
+        keyString.put(TaoBaoBeautyConstant.PAGE, page);
         DispatchRequest dispatchRequest = DispatchRequest.builder()
-                .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D006.getId()))
+                .key(KeyUtil.structureKey(keyString, ServiceIdEnum.D007.getId()))
                 .request(getRequest(queryString))
                 .requestParam(queryString)
-                .callId(ServiceIdEnum.D006.getId())
+                .callId(ServiceIdEnum.D007.getId())
                 .okHttpClient(new OkHttpClient())
                 .timeOut(timeOut)
                 .isEnable(isEnable)
@@ -117,17 +115,8 @@ public class NationalDataCallable implements ConcurrentCallable {
     }
 
     private Result dealQueryResult(Result result, DispatchRequest dispatchRequest) {
-        JSONObject jsonResult = result.getJsonResult();
-        JSONArray resultArray = jsonResult.getJSONArray(NationalDataConstant.RESULT);
-        for (int i = 0; i < resultArray.size(); i++) {
-            resultArray.getJSONObject(i).remove(NationalDataConstant.PRANK);
-            resultArray.getJSONObject(i).remove(NationalDataConstant.RANK);
-            resultArray.getJSONObject(i).remove(NationalDataConstant.REPORT);
-            resultArray.getJSONObject(i).remove(NationalDataConstant.EXP);
-        }
-        jsonResult.put(NationalDataConstant.RESULT, resultArray);
-        result.setJsonResult(jsonResult);
         redisService.asyncSet(dispatchRequest.getKey(), result.getJsonResult().toJSONString(), 30 * 24 * 3600);
         return result;
     }
+
 }

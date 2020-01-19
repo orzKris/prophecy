@@ -94,5 +94,12 @@ data:
   searchKey: searchdata
   timeOut: 2000
   isEnable: true
+# 淘女郎查询
+beauty:
+  url: https://route.showapi.com/126-2
+  appId: 139636
+  appSecret: 9fd15d81cdea4fed85ae4205e62cee80
+  timeOut: 2000
+  isEnable: true
 
 
