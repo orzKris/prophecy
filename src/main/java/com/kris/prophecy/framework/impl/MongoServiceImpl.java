@@ -47,11 +47,7 @@ public class MongoServiceImpl implements MongoService {
     @Override
     public DataCenter findById(String id) {
         Optional<DataCenter> optional = dataCenterService.findById(id);
-        if (optional.isPresent()) {
-            return optional.get();
-        } else {
-            return new DataCenter();
-        }
+        return optional.orElseGet(DataCenter::new);
     }
 
     /**
