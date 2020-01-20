@@ -115,7 +115,9 @@ public class TaoBaoBeautyCallable implements ConcurrentCallable {
     }
 
     private Result dealQueryResult(Result result, DispatchRequest dispatchRequest) {
-        redisService.asyncSet(dispatchRequest.getKey(), result.getJsonResult().toJSONString(), 30 * 24 * 3600);
+        if (result.getJsonResult().getString(TaoBaoBeautyConstant.SHOW_API_RES_CODE).equals("0")) {
+            redisService.asyncSet(dispatchRequest.getKey(), result.getJsonResult().toJSONString(), 30 * 24 * 3600);
+        }
         return result;
     }
 

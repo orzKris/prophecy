@@ -28,7 +28,6 @@ public class BeautySignUtil {
         //2.把所有参数名和参数值串在一起
         StringBuilder query = new StringBuilder();
         for (String key : keys) {
-            if (key.equals(TaoBaoBeautyConstant.SHOW_API_APP_ID)) continue;//此字段不参与签名
             String value = params.get(key) + "";
             if (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value)) {
                 query.append(key).append(value);
