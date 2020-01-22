@@ -6,8 +6,6 @@ package com.kris.prophecy.enums;
  */
 public class CommonConstant {
 
-    public static final String PARAM = "param";
-
     public static final String UID = "uid";
 
     public static final String PARAM_MUST_BE_JSON = "param必须为json字符串";
