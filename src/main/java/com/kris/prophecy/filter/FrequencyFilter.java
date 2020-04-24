@@ -19,15 +19,13 @@ import java.util.concurrent.TimeUnit;
  */
 public class FrequencyFilter implements Filter {
 
-    private static final long REQUEST_INTERVAL = 60000;
-
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void init(FilterConfig filterConfig) {
         ServletContext context = filterConfig.getServletContext();
         ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(context);
-        redisTemplate = (RedisTemplate) applicationContext.getBean("redisTemplate");
+        redisTemplate = (RedisTemplate<String, String>) applicationContext.getBean("redisTemplate");
     }
 
     @Override
@@ -37,14 +35,8 @@ public class FrequencyFilter implements Filter {
 
         String tokenId = request.getHeader("uid");
         String url = request.getRequestURI();
-        Long currentTime = System.currentTimeMillis();
-        Long lastTime = 0L;
         Object str = redisTemplate.opsForValue().get(tokenId + url);
         if (null != str) {
-            lastTime = Long.valueOf(str.toString());
-        }
-        if (currentTime - lastTime < REQUEST_INTERVAL) {
-            redisTemplate.opsForValue().set(tokenId + url, System.currentTimeMillis() + "", 1, TimeUnit.MINUTES);
             response.setContentType("application/json;charset=UTF-8");
             Writer writer = response.getWriter();
             JSONObject jsonObject = new JSONObject();
